@@ -1,0 +1,1983 @@
+<!DOCTYPE html>
+<!-- PT HANSOLL INDO JAVA (HIJ) — AI/자동화 진행현황 대시보드 (1단계 로컬 테스트 버전) -->
+<html lang="ko"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PT HANSOLL INDO JAVA | AI / 자동화 진행 현황</title>
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+<link rel="stylesheet" as="style" crossorigin="" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&amp;display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F2F4F5;
+  --surface:#FFFFFF;
+  --surface-2:#F8F9FA;
+  --ink:#0F1D2B;
+  --ink-soft:#4A5A68;
+  --ink-faint:#8493A0;
+  --line:#DCE3E7;
+  --line-soft:#EAEFF1;
+  --amber:#B8863B;
+  --amber-deep:#8C6423;
+  --amber-tint:#F3EAD9;
+  --teal:#1E3A5F;
+  --teal-tint:#E7EDF3;
+  --brick:#BD4B3C;
+  --brick-tint:#FBE8E4;
+  --sidebar:#1E3A5F;
+  --sidebar-line:#2E4F78;
+  --radius:10px;
+  --shadow:0 1px 2px rgba(15,29,43,0.06), 0 6px 20px rgba(15,29,43,0.05);
+  --font-display:'Pretendard',sans-serif;
+  --font-body:'Pretendard',sans-serif;
+  --font-mono:'IBM Plex Mono',monospace;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:var(--font-body);
+  background:var(--bg);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:var(--font-display);font-weight:600;margin:0;letter-spacing:0.01em;}
+button{font-family:var(--font-body);cursor:pointer;}
+input,select,textarea{font-family:var(--font-body);}
+::selection{background:var(--amber-tint);}
+
+/* ---------- App shell ---------- */
+.app{display:flex;min-height:100vh;}
+
+/* Sidebar */
+.sidebar{
+  width:250px;flex-shrink:0;background:var(--sidebar);color:#C9D4DC;
+  display:flex;flex-direction:column;transition:width .2s ease;position:relative;z-index:20;
+}
+.sidebar.collapsed{width:72px;}
+.sidebar-top{padding:22px 20px 18px;border-bottom:1px solid var(--sidebar-line);display:flex;align-items:center;gap:12px;}
+.brand-mark{
+  width:38px;height:38px;flex-shrink:0;border-radius:8px;background:linear-gradient(155deg,var(--amber),var(--amber-deep));
+  display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:700;color:#1E3A5F;font-size:13px;letter-spacing:0.02em;
+}
+.brand-text{overflow:hidden;white-space:nowrap;}
+.brand-text .l1{font-family:var(--font-display);font-size:15px;font-weight:600;color:#fff;letter-spacing:0.03em;}
+.brand-text .l2{font-size:10.5px;color:#8493A0;letter-spacing:0.08em;text-transform:uppercase;margin-top:1px;}
+.sidebar.collapsed .brand-text{display:none;}
+
+.nav-groups{flex:1;padding:16px 12px;overflow-y:auto;}
+.nav-label{font-size:10.5px;color:#5D6E7C;text-transform:uppercase;letter-spacing:0.12em;padding:14px 12px 6px;font-weight:600;}
+.sidebar.collapsed .nav-label{display:none;}
+.nav-item{
+  display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:8px;color:#C9D4DC;
+  font-size:13.5px;font-weight:500;cursor:pointer;margin-bottom:2px;white-space:nowrap;overflow:hidden;
+  border-left:3px solid transparent;
+}
+.nav-item .ic{width:18px;text-align:center;flex-shrink:0;font-size:14px;}
+.nav-item:hover{background:#1A2734;color:#fff;}
+.nav-item.active{background:#1A2734;color:#fff;border-left:3px solid var(--amber);}
+.sidebar.collapsed .nav-item span.label{display:none;}
+.sidebar.collapsed .nav-item{justify-content:center;}
+
+/* Dept submenu inside sidebar */
+.nav-item-projects{display:flex;align-items:center;}
+.nav-item-projects .label{flex:1;}
+.nav-badge-n{
+  background:var(--brick);color:#fff;font-size:9px;font-weight:800;width:16px;height:16px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-right:6px;
+}
+.nav-badge-count{
+  background:#22344A;color:#BFD4EA;font-family:var(--font-mono);font-size:11px;font-weight:700;
+  padding:2px 8px;border-radius:20px;flex-shrink:0;min-width:20px;text-align:center;margin-right:4px;
+}
+.nav-expand-btn{
+  background:none;border:none;color:#8493A0;font-size:11px;padding:2px 5px;flex-shrink:0;line-height:1;
+}
+.nav-expand-btn:hover{color:#fff;}
+.sidebar.collapsed .nav-badge-n,.sidebar.collapsed .nav-badge-count,.sidebar.collapsed .nav-expand-btn{display:none;}
+.sidebar.collapsed .dept-submenu{display:none;}
+
+.dept-submenu{padding:2px 4px 10px;margin-bottom:2px;}
+.dept-submenu.collapsed{display:none;}
+.dept-submenu-sort{position:relative;margin:6px 6px 8px;}
+.sort-pill{
+  width:100%;background:#1A2734;border:1px solid var(--sidebar-line);color:#C9D4DC;border-radius:20px;
+  padding:7px 10px;font-size:11.5px;font-weight:600;display:flex;align-items:center;gap:6px;justify-content:center;
+}
+.sort-pill:hover{border-color:#3A4A58;color:#fff;}
+.sort-dropdown{
+  position:absolute;top:calc(100% + 4px);left:0;right:0;background:#16222E;border:1px solid var(--sidebar-line);
+  border-radius:8px;padding:4px;z-index:30;display:none;box-shadow:0 10px 30px rgba(0,0,0,.4);
+}
+.sort-dropdown.show{display:block;}
+.sort-dropdown div{padding:8px 10px;font-size:12px;color:#C9D4DC;border-radius:6px;cursor:pointer;}
+.sort-dropdown div:hover{background:#1E2E3D;color:#fff;}
+.sort-dropdown div.active{color:var(--amber);font-weight:700;}
+
+.dept-submenu-list{display:flex;flex-direction:column;gap:1px;}
+.dept-sub-row{display:flex;align-items:center;gap:9px;padding:8px 10px 8px 14px;border-radius:7px;cursor:pointer;font-size:12.5px;color:#C9D4DC;}
+.dept-sub-row:hover{background:#1A2734;color:#fff;}
+.dept-sub-row.active{background:#1E3A52;color:#fff;}
+.dept-sub-row .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.dept-sub-row .d-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;}
+.dept-sub-row .n-badge{background:var(--brick);color:#fff;font-size:9px;font-weight:800;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.dept-sub-row .cnt-badge{background:#22344A;color:#BFD4EA;font-family:var(--font-mono);font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;flex-shrink:0;min-width:22px;text-align:center;}
+
+.sidebar-bottom{padding:12px;border-top:1px solid var(--sidebar-line);}
+.collapse-btn{
+  width:100%;background:none;border:1px solid var(--sidebar-line);color:#8493A0;border-radius:8px;
+  padding:9px;font-size:12px;display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.collapse-btn:hover{color:#fff;border-color:#3A4A58;}
+
+/* Main */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;}
+.topbar{
+  height:62px;flex-shrink:0;background:var(--surface);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:10;
+}
+.topbar-title{font-family:var(--font-display);font-size:17px;font-weight:600;}
+.topbar-sub{font-size:12px;color:var(--ink-faint);margin-top:1px;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+
+.content{padding:26px 28px 60px;max-width:1360px;width:100%;margin:0 auto;}
+
+/* ---------- Buttons ---------- */
+.btn{
+  border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;
+  padding:9px 15px;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:7px;
+  transition:all .12s ease;
+}
+.btn:hover{border-color:var(--ink-faint);}
+.btn-primary{background:var(--amber);border-color:var(--amber);color:#1a1206;}
+.btn-primary:hover{background:var(--amber-deep);border-color:var(--amber-deep);color:#fff;}
+.btn-ghost{background:none;border-color:transparent;color:var(--ink-soft);}
+.btn-ghost:hover{background:var(--surface-2);}
+.btn-danger{background:none;border-color:var(--brick);color:var(--brick);}
+.btn-danger:hover{background:var(--brick);color:#fff;}
+.btn-sm{padding:6px 11px;font-size:12px;}
+.btn:disabled{opacity:.45;cursor:not-allowed;}
+
+/* ---------- KPI summary cards ---------- */
+.card-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px;}
+.stat-card{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 18px 16px;
+  box-shadow:var(--shadow);
+}
+.stat-card .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.stat-card .label{font-size:12px;color:var(--ink-soft);font-weight:600;}
+.stat-card .icon{font-size:15px;opacity:.7;}
+.stat-card .value{font-family:var(--font-mono);font-size:28px;font-weight:600;color:var(--ink);line-height:1;}
+.stat-card .value .unit{font-size:14px;color:var(--ink-faint);margin-left:4px;}
+.stat-card .foot{font-size:11.5px;color:var(--ink-faint);margin-top:8px;}
+.stat-card .foot a{color:var(--amber-deep);font-weight:600;text-decoration:none;cursor:pointer;}
+.stat-card.accent-amber .value{color:var(--amber-deep);}
+.stat-card.accent-teal .value{color:var(--teal);}
+.stat-card.accent-brick .value{color:var(--brick);}
+
+/* ---------- Panels ---------- */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:18px;}
+.panel-head{padding:16px 20px;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;justify-content:space-between;}
+.panel-head h3{font-size:14.5px;}
+.panel-head .hint{font-size:11px;color:var(--ink-faint);font-weight:400;margin-top:2px;font-family:var(--font-body);}
+.panel-body{padding:18px 20px 20px;}
+.panel-row{display:grid;grid-template-columns:1.15fr 1fr;gap:16px;}
+
+/* Stage funnel bars */
+.stage-list{display:flex;flex-direction:column;gap:10px;}
+.stage-row{display:grid;grid-template-columns:96px 1fr 42px;align-items:center;gap:10px;cursor:pointer;}
+.stage-row .stg-name{font-size:12px;font-weight:600;color:var(--ink-soft);}
+.stage-row .stg-track{height:20px;background:var(--surface-2);border-radius:5px;overflow:hidden;}
+.stage-row .stg-fill{height:100%;background:linear-gradient(90deg,var(--amber),var(--amber-deep));border-radius:5px;transition:width .3s ease;}
+.stage-row .stg-count{font-family:var(--font-mono);font-size:12.5px;font-weight:600;text-align:right;}
+.stage-row:hover .stg-name{color:var(--amber-deep);}
+
+/* Category bars */
+.cat-row{display:grid;grid-template-columns:1fr 1fr 34px;align-items:center;gap:10px;cursor:pointer;margin-bottom:9px;}
+.cat-row .cat-name{font-size:12px;font-weight:600;color:var(--ink-soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cat-row .cat-track{height:16px;background:var(--surface-2);border-radius:5px;overflow:hidden;}
+.cat-row .cat-fill{height:100%;background:linear-gradient(90deg,var(--teal),#3E938F);border-radius:5px;}
+.cat-row .cat-count{font-family:var(--font-mono);font-size:12px;font-weight:600;text-align:right;}
+.cat-row:hover .cat-name{color:var(--teal);}
+
+/* Top3 */
+.top3-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.top3-card{border:1px solid var(--line);border-radius:9px;padding:14px;position:relative;background:var(--surface-2);}
+.top3-rank{
+  position:absolute;top:-10px;left:12px;width:24px;height:24px;border-radius:50%;background:var(--ink);color:#fff;
+  font-family:var(--font-mono);font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;
+}
+.top3-card .dept-tag{display:inline-block;}
+.top3-card .t3-title{font-size:13px;font-weight:600;margin:9px 0 6px;line-height:1.35;min-height:35px;}
+.top3-card .t3-bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-bottom:6px;}
+.top3-card .t3-fill{height:100%;background:var(--amber);}
+.top3-card .t3-pct{font-family:var(--font-mono);font-size:16px;font-weight:600;color:var(--amber-deep);}
+
+/* Dept bar chart (dashboard) */
+.dept-bars{display:flex;align-items:flex-end;gap:14px;height:170px;padding-top:10px;}
+.dept-bar-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;cursor:pointer;}
+.dept-bar-col .bar{width:100%;max-width:44px;background:linear-gradient(180deg,#3E938F,var(--teal));border-radius:5px 5px 2px 2px;transition:opacity .12s;}
+.dept-bar-col:hover .bar{opacity:.75;}
+.dept-bar-col .bar-val{font-family:var(--font-mono);font-size:11.5px;font-weight:600;color:var(--ink-soft);margin-bottom:4px;}
+.dept-bar-col .bar-label{font-size:10.5px;color:var(--ink-faint);margin-top:8px;text-align:center;line-height:1.25;}
+
+/* Dept status cards */
+.dept-card-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+.dept-card{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;cursor:pointer;
+  box-shadow:var(--shadow);transition:transform .12s ease, border-color .12s ease;
+}
+.dept-card:hover{transform:translateY(-2px);border-color:var(--amber);}
+.dept-card .dc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.dept-card .dc-name{font-family:var(--font-display);font-size:15px;font-weight:600;}
+.dept-card .dc-count{font-family:var(--font-mono);font-size:11px;background:var(--surface-2);border-radius:20px;padding:3px 9px;color:var(--ink-soft);font-weight:600;}
+.dept-card .dc-metrics{display:flex;gap:14px;margin-top:10px;}
+.dept-card .dc-metric .m-label{font-size:10.5px;color:var(--ink-faint);}
+.dept-card .dc-metric .m-val{font-family:var(--font-mono);font-size:16px;font-weight:600;margin-top:2px;}
+.dept-card .dc-bar{height:5px;background:var(--line);border-radius:3px;overflow:hidden;margin-top:12px;}
+.dept-card .dc-fill{height:100%;background:var(--amber);}
+
+/* Tags */
+.dept-tag{
+  display:inline-flex;align-items:center;font-family:var(--font-mono);font-size:10.5px;font-weight:600;
+  padding:3px 8px;border-radius:4px;background:var(--ink);color:#fff;letter-spacing:0.02em;
+}
+.stage-tag{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;padding:4px 9px;border-radius:20px;}
+.stage-tag.st-0{background:#EEF1F3;color:#5D6E7C;}
+.stage-tag.st-1{background:var(--amber-tint);color:var(--amber-deep);}
+.stage-tag.st-2{background:#FDEBD9;color:#C6791E;}
+.stage-tag.st-3{background:#E3F0FB;color:#2A6FA8;}
+.stage-tag.st-4{background:var(--teal-tint);color:var(--teal);}
+.stage-dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+
+/* ---------- Filters / table toolbar ---------- */
+.toolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;}
+.filter-group{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.filter-group select{
+  border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:12.5px;background:var(--surface);color:var(--ink);
+}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--amber-tint);color:var(--amber-deep);border-radius:20px;padding:5px 10px;font-size:12px;font-weight:600;}
+.chip button{background:none;border:none;color:var(--amber-deep);font-weight:700;padding:0;font-size:13px;line-height:1;}
+.view-toggle{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;}
+.view-toggle button{border:none;background:var(--surface);padding:8px 12px;font-size:12px;font-weight:600;color:var(--ink-faint);}
+.view-toggle button.active{background:var(--ink);color:#fff;}
+
+/* Project cards (grid mode) */
+.proj-card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
+.proj-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);}
+.proj-card .pc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:9px;gap:8px;}
+.proj-card .pc-title{font-size:13.5px;font-weight:700;line-height:1.4;margin:9px 0 4px;}
+.proj-card .pc-cat{font-size:11.5px;color:var(--ink-faint);margin-bottom:10px;}
+.proj-card .pc-goal{font-size:12px;color:var(--ink-soft);line-height:1.5;margin-bottom:12px;min-height:34px;}
+.proj-card .pc-bar-wrap{display:flex;align-items:center;gap:9px;margin-bottom:12px;}
+.proj-card .pc-bar{flex:1;height:6px;background:var(--line);border-radius:3px;overflow:hidden;}
+.proj-card .pc-fill{height:100%;background:var(--amber);}
+.proj-card .pc-pct{font-family:var(--font-mono);font-size:12.5px;font-weight:600;}
+.proj-card .pc-actions{display:flex;gap:6px;margin-top:10px;border-top:1px solid var(--line-soft);padding-top:10px;}
+
+/* Table */
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12.5px;}
+thead th{
+  text-align:left;padding:10px 12px;background:var(--surface-2);color:var(--ink-soft);font-weight:600;
+  border-bottom:1px solid var(--line);white-space:nowrap;cursor:pointer;user-select:none;font-size:11.5px;
+  text-transform:uppercase;letter-spacing:0.03em;
+}
+thead th:hover{color:var(--amber-deep);}
+tbody td{padding:11px 12px;border-bottom:1px solid var(--line-soft);vertical-align:middle;}
+tbody tr:hover{background:var(--surface-2);}
+.link-btn{color:var(--teal);font-weight:600;text-decoration:none;font-size:12px;cursor:pointer;}
+.link-btn:hover{text-decoration:underline;}
+.row-actions{display:flex;gap:6px;}
+.icon-btn{border:1px solid var(--line);background:var(--surface);border-radius:6px;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;}
+.icon-btn:hover{border-color:var(--ink-faint);}
+
+/* Empty state */
+.empty-state{padding:44px 20px;text-align:center;color:var(--ink-faint);}
+.empty-state .es-icon{font-size:30px;margin-bottom:10px;}
+.empty-state .es-text{font-size:13px;}
+
+/* Alerts */
+.alert-box{
+  background:var(--brick-tint);border:1px solid #F0C6BE;border-radius:9px;padding:13px 16px;margin-bottom:16px;
+  display:flex;align-items:flex-start;gap:10px;
+}
+.alert-box .a-ic{font-size:15px;color:var(--brick);}
+.alert-box .a-body{flex:1;}
+.alert-box .a-title{font-size:12.5px;font-weight:700;color:#8F3527;margin-bottom:2px;}
+.alert-box .a-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+.alert-chip{
+  background:var(--surface);border:1px solid #F0C6BE;border-radius:7px;padding:6px 10px;font-size:12px;display:flex;align-items:center;gap:8px;
+}
+.alert-chip button{font-size:11px;padding:4px 8px;}
+
+/* ---------- Modal ---------- */
+.overlay{position:fixed;inset:0;background:rgba(15,25,35,0.55);display:none;align-items:center;justify-content:center;z-index:100;padding:20px;}
+.overlay.show{display:flex;}
+.modal{background:var(--surface);border-radius:12px;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
+.modal.wide{max-width:640px;}
+.modal-head{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--surface);z-index:2;}
+.modal-head h3{font-size:15.5px;}
+.modal-close{background:none;border:none;font-size:18px;color:var(--ink-faint);line-height:1;padding:4px;}
+.modal-close:hover{color:var(--ink);}
+.modal-body{padding:20px 22px;}
+.modal-foot{padding:16px 22px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:9px;}
+.form-row{margin-bottom:14px;}
+.form-row label{display:block;font-size:12px;font-weight:600;color:var(--ink-soft);margin-bottom:6px;}
+.form-row label .req{color:var(--brick);}
+.form-row input[type=text],.form-row input[type=number],.form-row input[type=date],.form-row input[type=password],
+.form-row input[type=url],.form-row select,.form-row textarea{
+  width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-size:13px;color:var(--ink);background:var(--surface);
+}
+.form-row input:focus,.form-row select:focus,.form-row textarea:focus{outline:2px solid var(--amber);outline-offset:0;border-color:var(--amber);}
+.form-row textarea{resize:vertical;min-height:60px;}
+.form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-hint{font-size:11px;color:var(--ink-faint);margin-top:5px;line-height:1.5;}
+.radio-group{display:flex;gap:16px;}
+.radio-group label{display:flex;align-items:center;gap:6px;font-weight:500;font-size:13px;color:var(--ink);}
+.calc-box{background:var(--surface-2);border:1px dashed var(--line);border-radius:8px;padding:12px;font-size:12.5px;color:var(--ink-soft);margin-top:8px;}
+.calc-box .cb-formula{font-family:var(--font-mono);font-size:13px;color:var(--ink);font-weight:600;margin-top:4px;}
+.err-text{color:var(--brick);font-size:12px;margin-top:8px;display:none;}
+
+/* Settings */
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.settings-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);}
+.settings-card .sc-head{padding:15px 18px;border-bottom:1px solid var(--line-soft);font-family:var(--font-display);font-size:14px;font-weight:600;}
+.settings-card .sc-body{padding:16px 18px;}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line-soft);}
+.settings-row:last-child{border-bottom:none;}
+.settings-row .sr-label{font-size:13px;font-weight:600;}
+.settings-row .sr-desc{font-size:11.5px;color:var(--ink-faint);margin-top:2px;}
+.dept-manage-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line-soft);}
+.dept-manage-row input{flex:1;border:1px solid var(--line);border-radius:6px;padding:7px 9px;font-size:12.5px;}
+.login-badge{display:flex;align-items:center;gap:8px;background:var(--teal-tint);color:var(--teal);border-radius:20px;padding:6px 12px 6px 8px;font-size:12.5px;font-weight:600;}
+.login-badge .lb-dot{width:7px;height:7px;border-radius:50%;background:var(--teal);}
+
+.locked-note{
+  background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:26px;text-align:center;color:var(--ink-soft);
+}
+.locked-note .ln-ic{font-size:26px;margin-bottom:8px;}
+
+@media (max-width:1100px){
+  .card-grid{grid-template-columns:repeat(2,1fr);}
+  .panel-row{grid-template-columns:1fr;}
+  .top3-grid{grid-template-columns:1fr;}
+  .dept-card-grid{grid-template-columns:repeat(2,1fr);}
+  .settings-grid{grid-template-columns:1fr;}
+}
+@media (max-width:640px){
+  .sidebar{position:fixed;left:0;top:0;bottom:0;transform:translateX(-100%);}
+  .sidebar.mobile-open{transform:translateX(0);}
+  .card-grid{grid-template-columns:1fr 1fr;}
+  .form-grid-2{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-top">
+      <div class="brand-mark">HIJ</div>
+      <div class="brand-text">
+        <div class="l1">PT HANSOLL INDO JAVA</div>
+        <div class="l2">AI / 자동화 진행 현황</div>
+      </div>
+    </div>
+    <nav class="nav-groups">
+      <div class="nav-label">요약 대시보드</div>
+      <div class="nav-item active" data-nav="summary"><span class="ic">🧭</span><span class="label">법인 현황</span></div>
+      <div class="nav-item" data-nav="dept"><span class="ic">🏭</span><span class="label">부서별 변황</span></div>
+      <div class="nav-label">Projects</div>
+      <div class="nav-item nav-item-projects" data-nav="projects">
+        <span class="ic">🗂️</span><span class="label">부서별 과제 세부</span>
+        <span class="nav-badge-n" id="projFolderNBadge" style="display:none;">N</span>
+        <span class="nav-badge-count" id="projTotalBadge">0</span>
+        <button class="nav-expand-btn" id="projSubmenuToggle" title="펼치기/접기">▾</button>
+      </div>
+      <div class="dept-submenu" id="deptSubmenu">
+        <div class="dept-submenu-sort">
+          <button class="sort-pill" id="deptSortPill">⇅ <span id="deptSortLabel">과제 많은순</span></button>
+          <div class="sort-dropdown" id="deptSortDropdown">
+            <div data-sort-opt="default">기본순(등록순)</div>
+            <div data-sort-opt="name">이름순(가나다)</div>
+            <div data-sort-opt="countDesc" class="active">과제 많은순</div>
+            <div data-sort-opt="countAsc">과제 적은순</div>
+          </div>
+        </div>
+        <div class="dept-submenu-list" id="deptSubmenuList"><div class="dept-sub-row " data-dept-row="ME">
+      <span class="dot" style="background:#5B8DEF"></span>
+      <span class="d-name">ME</span>
+      
+      <span class="cnt-badge">0</span>
+    </div><div class="dept-sub-row " data-dept-row="MD/PPIC">
+      <span class="dot" style="background:#3EC28F"></span>
+      <span class="d-name">MD/PPIC</span>
+      
+      <span class="cnt-badge">0</span>
+    </div><div class="dept-sub-row " data-dept-row="SAMPLE">
+      <span class="dot" style="background:#E2A63C"></span>
+      <span class="d-name">SAMPLE</span>
+      
+      <span class="cnt-badge">0</span>
+    </div><div class="dept-sub-row " data-dept-row="CSR">
+      <span class="dot" style="background:#9B6BDE"></span>
+      <span class="d-name">CSR</span>
+      
+      <span class="cnt-badge">0</span>
+    </div><div class="dept-sub-row " data-dept-row="EXIM">
+      <span class="dot" style="background:#38B6C4"></span>
+      <span class="d-name">EXIM</span>
+      
+      <span class="cnt-badge">0</span>
+    </div><div class="dept-sub-row " data-dept-row="ACCOUNTING">
+      <span class="dot" style="background:#E0609B"></span>
+      <span class="d-name">ACCOUNTING</span>
+      
+      <span class="cnt-badge">0</span>
+    </div><div class="dept-sub-row " data-dept-row="HRD">
+      <span class="dot" style="background:#8493A0"></span>
+      <span class="d-name">HRD</span>
+      
+      <span class="cnt-badge">0</span>
+    </div></div>
+      </div>
+      <div class="nav-label">Performance</div>
+      <div class="nav-item" data-nav="kpi"><span class="ic">🎯</span><span class="label">과제별 성과(KPI)</span></div>
+      <div class="nav-label">Admin</div>
+      <div class="nav-item" data-nav="settings"><span class="ic">⚙️</span><span class="label">설정</span></div>
+    </nav>
+    <div class="sidebar-bottom">
+      <button class="collapse-btn" id="collapseBtn">⏴ <span class="label">사이드바 접기</span></button>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title" id="topbarTitle">법인 현황</div>
+        <div class="topbar-sub" id="topbarSub">조직별 AI 프로젝트 진행 및 성과 현황 종합 관리</div>
+      </div>
+      <div class="topbar-right" id="topbarRight"></div>
+    </div>
+    <div class="content" id="content">
+  <div class="card-grid">
+    <div class="stat-card ">
+    <div class="top"><span class="label">총 추진 과제 수</span><span class="icon">🗂️</span></div>
+    <div class="value">0 건</div>
+    <div class="foot">참여 부서 0개</div>
+  </div>
+    <div class="stat-card accent-amber">
+    <div class="top"><span class="label">평균 목표 달성률</span><span class="icon">🎯</span></div>
+    <div class="value">0%</div>
+    <div class="foot">전체 과제 평균</div>
+  </div>
+    <div class="stat-card accent-teal">
+    <div class="top"><span class="label">완료 및 운영 건수</span><span class="icon">🚀</span></div>
+    <div class="value">0 건</div>
+    <div class="foot">전체의 0% · <a data-goto="kpi">KPI 상세 보기 →</a></div>
+  </div>
+    <div class="stat-card ">
+    <div class="top"><span class="label">진행 중 과제</span><span class="icon">⚙️</span></div>
+    <div class="value">0 건</div>
+    <div class="foot">기획/검토 ~ 안정화 단계</div>
+  </div>
+    <div class="stat-card accent-brick">
+    <div class="top"><span class="label">성과 측정 완료 과제</span><span class="icon">🏆</span></div>
+    <div class="value">0 건</div>
+    <div class="foot">현업 운영 중인 완료 과제</div>
+  </div>
+  </div>
+
+  <div class="panel-row">
+    <div class="panel">
+      <div class="panel-head"><div><h3>① 단계별 과제 진행 현황</h3><div class="hint">클릭 시 해당 단계로 필터링된 과제 목록으로 이동</div></div></div>
+      <div class="panel-body">
+        <div class="stage-list">
+          
+            <div class="stage-row" data-goto-stage="기획/검토">
+              <div class="stg-name">기획/검토</div>
+              <div class="stg-track"><div class="stg-fill" style="width:0%"></div></div>
+              <div class="stg-count">0건</div>
+            </div>
+            <div class="stage-row" data-goto-stage="초기 도입">
+              <div class="stg-name">초기 도입</div>
+              <div class="stg-track"><div class="stg-fill" style="width:0%"></div></div>
+              <div class="stg-count">0건</div>
+            </div>
+            <div class="stage-row" data-goto-stage="파일럿 테스트">
+              <div class="stg-name">파일럿 테스트</div>
+              <div class="stg-track"><div class="stg-fill" style="width:0%"></div></div>
+              <div class="stg-count">0건</div>
+            </div>
+            <div class="stage-row" data-goto-stage="안정화 단계">
+              <div class="stg-name">안정화 단계</div>
+              <div class="stg-track"><div class="stg-fill" style="width:0%"></div></div>
+              <div class="stg-count">0건</div>
+            </div>
+            <div class="stage-row" data-goto-stage="완료/운영">
+              <div class="stg-name">완료/운영</div>
+              <div class="stg-track"><div class="stg-fill" style="width:0%"></div></div>
+              <div class="stg-count">0건</div>
+            </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><div><h3>② 분류별 AI 도입 집중도</h3><div class="hint">클릭 시 해당 분류로 필터링된 과제 목록으로 이동</div></div></div>
+      <div class="panel-body">
+        <div class="empty-state"><div class="es-icon">🙈</div><div class="es-text">등록된 과제 분류가 없습니다.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><div><h3>⭐ 상위 우수 진행 과제 (Top Progress)</h3><div class="hint">진행 중 과제 중 진척도 상위 3건</div></div></div>
+    <div class="panel-body">
+      <div class="empty-state"><div class="es-icon">🙈</div><div class="es-text">진행 중인 과제가 없습니다.</div></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><div><h3>③ 부서별 과제 추진 현황</h3><div class="hint">막대 클릭 시 해당 부서 수행과제로 이동</div></div></div>
+    <div class="panel-body">
+      <div class="empty-state"><div class="es-icon">🙈</div><div class="es-text">등록된 과제가 없습니다.</div></div>
+    </div>
+  </div>
+  </div>
+  </div>
+</div>
+
+<!-- ============ MODALS ============ -->
+
+<!-- Login -->
+<div class="overlay" id="loginOverlay">
+  <div class="modal">
+    <div class="modal-head"><h3>🔐 로그인</h3><button class="modal-close" data-close="loginOverlay">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row"><label>아이디 <span class="req">*</span></label><input type="text" id="loginId" autocomplete="off"></div>
+      <div class="form-row"><label>비밀번호 <span class="req">*</span></label><input type="password" id="loginPw" autocomplete="off"></div>
+      <div class="err-text" id="loginErr" style="display: none;">아이디 또는 비밀번호가 올바르지 않습니다.</div>
+      <div class="form-hint">부서 담당자 계정은 자기 부서의 과제·KPI만 등록·수정할 수 있습니다. 관리자 계정은 전체 부서를 관리합니다.</div>
+    </div>
+    <div class="modal-foot"><button class="btn" data-close="loginOverlay">취소</button><button class="btn btn-primary" id="loginSubmit">로그인</button></div>
+  </div>
+</div>
+
+<!-- Project Add/Edit -->
+<div class="overlay" id="projectOverlay">
+  <div class="modal">
+    <div class="modal-head"><h3 id="projectModalTitle">➕ 신규 과제 추가</h3><button class="modal-close" data-close="projectOverlay">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <label>부서명 <span class="req">*</span></label>
+        <select id="pf_dept"><option value="">선택하세요</option></select>
+      </div>
+      <div class="form-row"><label>과제 분류 <span class="req">*</span></label><input type="text" id="pf_category" placeholder="예: 품질검사, 문서자동화, 예지보전"></div>
+      <div class="form-row"><label>AI 적용 핵심 과제명 <span class="req">*</span></label><input type="text" id="pf_title" placeholder="예: 재단 자동 검사 AI"></div>
+      <div class="form-grid-2">
+        <div class="form-row">
+          <label>진행 단계 <span class="req">*</span></label>
+          <select id="pf_stage">
+            <option value="기획/검토">기획/검토</option>
+            <option value="초기 도입">초기 도입</option>
+            <option value="파일럿 테스트">파일럿 테스트</option>
+            <option value="안정화 단계">안정화 단계</option>
+            <option value="완료/운영">완료/운영</option>
+          </select>
+        </div>
+        <div class="form-row"><label>달성률 (%)</label><input type="number" id="pf_achv" min="0" max="100" placeholder="0-100"></div>
+      </div>
+      <div class="form-row"><label>주요 성과 / 목표</label><textarea id="pf_goal" placeholder="예: 불량 재단 조기 검출로 리워크 30% 절감 목표"></textarea></div>
+      <div class="form-row">
+        <label>실적/성과 자료 링크 (선택)</label>
+        <input type="url" id="pf_link" placeholder="https://...">
+        <div class="form-hint">저장하면 목록에 "📄 실적 자료 보기" 버튼이 생깁니다. 새 탭에서 링크가 맞는지 먼저 확인해보세요.</div>
+        <a href="#" target="_blank" id="pf_linkPreview" class="link-btn" style="display:none;margin-top:6px;display:inline-block;">🔍 미리보기 (새 탭)</a>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn" data-close="projectOverlay">취소</button><button class="btn btn-primary" id="projectSubmit">확인</button></div>
+  </div>
+</div>
+
+<!-- KPI Add/Edit -->
+<div class="overlay" id="kpiOverlay">
+  <div class="modal wide">
+    <div class="modal-head"><h3 id="kpiModalTitle">➕ KPI 성과 추가</h3><button class="modal-close" data-close="kpiOverlay">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid-2">
+        <div class="form-row">
+          <label>부서명 <span class="req">*</span></label>
+          <select id="kf_dept"><option value="">선택하세요</option></select>
+        </div>
+        <div class="form-row">
+          <label>연관 과제 <span class="req">*</span></label>
+          <select id="kf_project"><option value="">과제를 선택하세요</option></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <label>유형 <span class="req">*</span></label>
+        <div class="radio-group">
+          <label><input type="radio" name="kf_type" value="재무" checked=""> 재무 (비용 절감)</label>
+          <label><input type="radio" name="kf_type" value="비재무"> 비재무 (Data 정확도 등)</label>
+        </div>
+      </div>
+
+      <div id="kf_financialBlock">
+        <div class="form-row">
+          <label>절감액 측정 방식</label>
+          <div class="radio-group">
+            <label><input type="radio" name="kf_calc" value="auto" checked=""> 인건비 기반 자동 계산 (추천)</label>
+            <label><input type="radio" name="kf_calc" value="manual"> 직접 입력</label>
+          </div>
+        </div>
+        <div id="kf_autoFields">
+          <div class="form-grid-2">
+            <div class="form-row"><label>시간당 인건비 ($/시간)</label><input type="number" id="kf_wage" min="0" step="0.01"></div>
+            <div class="form-row"><label>작업 인원 (명)</label><input type="number" id="kf_headcount" min="0" step="1"></div>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-row"><label>건당 작업시간 (시간)</label><input type="number" id="kf_hours" min="0" step="0.01"></div>
+            <div class="form-row">
+              <label>처리건수 / 주기</label>
+              <div style="display:flex;gap:6px;">
+                <input type="number" id="kf_units" min="0" step="1" style="flex:1;">
+                <select id="kf_cycle" style="width:96px;">
+                  <option value="건/일">건/일</option>
+                  <option value="건/주">건/주</option>
+                  <option value="건/월">건/월</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="calc-box">= 시간당 인건비 × 작업인원 × 건당작업시간 × 처리건수 → 1일 환산 절감액 <span class="cb-formula" id="kf_dailyPreview">$0</span></div>
+        </div>
+        <div id="kf_manualFields" style="display:none;">
+          <div class="form-row"><label>일일 절감액 ($/일)</label><input type="number" id="kf_manualDaily" min="0" step="0.01"></div>
+        </div>
+        <div class="form-row" style="margin-top:12px;"><label>개선(운영 시작)일 <span class="req">*</span></label><input type="date" id="kf_startDate"></div>
+      </div>
+
+      <div id="kf_nonFinancialBlock" style="display:none;">
+        <div class="form-row"><label>개선 지표 (예: 데이터 정확도, 오류율 등)</label><input type="text" id="kf_metricName" placeholder="예: 선적서류 데이터 정확도"></div>
+        <div class="form-row"><label>개선 결과</label><input type="text" id="kf_metricValue" placeholder="예: 90% → 98% (+8%p)"></div>
+      </div>
+
+      <div class="form-row"><label>비고 (선택)</label><textarea id="kf_note"></textarea></div>
+    </div>
+    <div class="modal-foot"><button class="btn" data-close="kpiOverlay">취소</button><button class="btn btn-primary" id="kpiSubmit">확인</button></div>
+  </div>
+</div>
+
+<!-- Delete confirm -->
+<div class="overlay" id="deleteOverlay">
+  <div class="modal">
+    <div class="modal-head"><h3>🗑️ 삭제 확인</h3><button class="modal-close" data-close="deleteOverlay">✕</button></div>
+    <div class="modal-body">
+      <p style="font-size:13.5px;color:var(--ink-soft);margin:0 0 4px;" id="deleteMsg">이 항목을 삭제하시겠습니까?</p>
+      <div class="form-hint">이 작업은 되돌릴 수 없습니다.</div>
+    </div>
+    <div class="modal-foot"><button class="btn" data-close="deleteOverlay">취소</button><button class="btn btn-danger" id="deleteConfirm">삭제</button></div>
+  </div>
+</div>
+
+<!-- Dept manage modal -->
+<div class="overlay" id="deptOverlay">
+  <div class="modal">
+    <div class="modal-head"><h3>🏢 부서 관리</h3><button class="modal-close" data-close="deptOverlay">✕</button></div>
+    <div class="modal-body">
+      <div id="deptManageList"></div>
+      <div style="display:flex;gap:8px;margin-top:14px;">
+        <input type="text" id="newDeptName" placeholder="새 부서명 입력" style="flex:1;border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-size:13px;">
+        <button class="btn btn-primary btn-sm" id="addDeptBtn">추가</button>
+      </div>
+      <div class="form-hint">과제가 등록된 부서는 삭제할 수 없습니다. 먼저 해당 부서의 과제를 다른 부서로 이동하거나 삭제해주세요.</div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-primary" data-close="deptOverlay">닫기</button></div>
+  </div>
+</div>
+
+<!-- toast -->
+<div id="toast" style="position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--ink); color: rgb(255, 255, 255); padding: 11px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; opacity: 0; transition: 0.25s; z-index: 200; pointer-events: none; box-shadow: rgba(0, 0, 0, 0.25) 0px 10px 30px;">KPI 성과가 초기화되었습니다.</div>
+
+<script>
+/* =====================================================================
+   PT HANSOLL INDO JAVA (HIJ) — AI 과제 대시보드
+   1단계 로컬 테스트 버전: 모든 데이터는 브라우저 localStorage에 저장됩니다.
+   (2단계 사내 서버 연동 시 loadState/saveState 부분을 API 호출로 교체하면 됩니다)
+===================================================================== */
+
+const STORAGE_KEYS = {
+  departments: 'hij_departments',
+  projects: 'hij_projects',
+  kpis: 'hij_kpis',
+  accounts: 'hij_accounts'
+};
+
+const DEFAULT_DEPARTMENTS = ['ME','MD/PPIC','SAMPLE','CSR','EXIM','ACCOUNTING','HRD','QA'];
+const STAGES = ['기획/검토','초기 도입','파일럿 테스트','안정화 단계','완료/운영'];
+const STAGE_CLASS = {'기획/검토':'st-0','초기 도입':'st-1','파일럿 테스트':'st-2','안정화 단계':'st-3','완료/운영':'st-4'};
+
+const DEPT_COLORS = ['#5B8DEF','#3EC28F','#E2A63C','#9B6BDE','#38B6C4','#E0609B','#8493A0','#4FC1E0','#E2703C','#6FCF97','#B084F0','#4EC9B0'];
+const NEW_BADGE_MS = 7*24*60*60*1000; // 등록 후 7일간 "N" 신규 표지 노출
+function isProjectNew(p){ return !!p.createdAt && (Date.now() - p.createdAt) < NEW_BADGE_MS; }
+
+const SAMPLE_PROJECTS = [
+  {
+    id: 'p1', dept: 'EXIM', category: '문서자동화',
+    title: 'SUBCON 계약서 작성 및 트래킹 자동화',
+    stage: '초기 도입', achv: 50,
+    goal: '기존 수작업 30분~1시간 소요 → 5분 이내 완료로 효율성 증대. 부서 간 Crosscheck 가능한 Tracking 웹서비스화',
+    link: '', createdAt: Date.now() - 5*24*60*60*1000
+  },
+  {
+    id: 'p2', dept: 'ACCOUNTING', category: '문서자동화',
+    title: 'PAYMENT REQUEST 생성 자동화',
+    stage: '초기 도입', achv: 25,
+    goal: 'ERP 매뉴얼 확인 후 수기 입력하던 결제요청서 자동 작성. 세목(Pph) 혼입 케이스 분류 작업 진행 중',
+    link: '', createdAt: Date.now() - 12*24*60*60*1000
+  },
+  {
+    id: 'p3', dept: 'HRD', category: '문서자동화',
+    title: '법인 상세 인력현황 리포트',
+    stage: '파일럿 테스트', achv: 85,
+    goal: '급여시스템 Raw Data 기반 일일 출근지표·부서별 인원 현황 대시보드화',
+    link: '', createdAt: Date.now() - 2*24*60*60*1000
+  },
+  {
+    id: 'p4', dept: 'SAMPLE', category: 'PLM(제품 수명 관리)',
+    title: 'Tech pack 자동 정리 / 입력',
+    stage: '완료/운영', achv: 100,
+    goal: 'Tech Pack 자동 분류·검색이 가능한 자체 PLM 시스템 구축 완료, 문서관리·이력관리 통합',
+    link: '', createdAt: Date.now() - 30*24*60*60*1000
+  }
+];
+
+const SAMPLE_KPIS = [
+  {
+    id: 'k1', dept:'SAMPLE', projectId:'p4', type:'재무', calcMethod:'auto',
+    wage: 2.5, headcount: 1, hours: 0.4, units: 15, cycle: '건/일',
+    startDate: '2026-05-01', note: 'Tech Pack 수작업 정리 인력 재배치로 인한 인건비 절감'
+  },
+  {
+    id: 'k2', dept:'SAMPLE', projectId:'p4', type:'비재무', calcMethod:'',
+    metricName:'Tech Pack 검색 소요시간', metricValue:'평균 15분 → 1분 이내 (-93%)',
+    startDate:'2026-05-01', note: '통합 검색 기능 도입 후 자료 탐색 시간 대폭 단축'
+  }
+];
+
+/* ---------------- accounts (부서별 로그인 계정) ---------------- */
+function deptToAccountId(d){
+  const base = (d||'dept').toLowerCase().replace(/[^a-z0-9]/g,'') || 'dept';
+  let id = base, n = 2;
+  while(state.accounts && state.accounts.find(a=>a.id===id)){ id = base + n; n++; }
+  return id;
+}
+function defaultAccounts(){
+  const accts = [{id:'admin', pw:'hij@2026', role:'admin', dept:null}];
+  DEFAULT_DEPARTMENTS.forEach(d=>{
+    accts.push({id: d.toLowerCase().replace(/[^a-z0-9]/g,''), pw:'hij1234', role:'dept', dept:d});
+  });
+  return accts;
+}
+function canManage(dept){
+  if(!state.loggedIn || !state.currentAccount) return false;
+  return state.currentAccount.role==='admin' || state.currentAccount.dept===dept;
+}
+function isAdmin(){ return state.loggedIn && state.currentAccount && state.currentAccount.role==='admin'; }
+
+let state = {
+  departments: [],
+  projects: [],
+  kpis: [],
+  accounts: [],
+  currentAccount: null,
+  loggedIn: false,
+  view: 'summary',
+  sidebarCollapsed: false,
+  filters: { dept:'all', stage:'all', category:'all', sort:'default', sortDir:'desc', mode:'table' },
+  editingProjectId: null,
+  editingKpiId: null,
+  pendingDelete: null, // {type:'project'|'kpi', id}
+  deptSubmenuOpen: true,
+  deptSort: 'default' // default(등록순) | name(가나다) | countDesc | countAsc
+};
+
+/* ---------------- persistence ---------------- */
+function loadState(){
+  try{
+    const d = localStorage.getItem(STORAGE_KEYS.departments);
+    state.departments = d ? JSON.parse(d) : DEFAULT_DEPARTMENTS.slice();
+  }catch(e){ state.departments = DEFAULT_DEPARTMENTS.slice(); }
+
+  try{
+    const p = localStorage.getItem(STORAGE_KEYS.projects);
+    state.projects = p ? JSON.parse(p) : SAMPLE_PROJECTS.slice();
+  }catch(e){ state.projects = SAMPLE_PROJECTS.slice(); }
+
+  try{
+    const k = localStorage.getItem(STORAGE_KEYS.kpis);
+    state.kpis = k ? JSON.parse(k) : SAMPLE_KPIS.slice();
+  }catch(e){ state.kpis = SAMPLE_KPIS.slice(); }
+
+  try{
+    const a = localStorage.getItem(STORAGE_KEYS.accounts);
+    state.accounts = a ? JSON.parse(a) : defaultAccounts();
+  }catch(e){ state.accounts = defaultAccounts(); }
+
+  // persist defaults on first run
+  if(!localStorage.getItem(STORAGE_KEYS.departments)) saveDepartments();
+  if(!localStorage.getItem(STORAGE_KEYS.projects)) saveProjects();
+  if(!localStorage.getItem(STORAGE_KEYS.kpis)) saveKpis();
+  if(!localStorage.getItem(STORAGE_KEYS.accounts)) saveAccounts();
+
+  const savedAccId = sessionStorage.getItem('hij_logged_in_account');
+  if(savedAccId){
+    const acc = state.accounts.find(a=>a.id===savedAccId);
+    if(acc){ state.currentAccount = acc; state.loggedIn = true; }
+  }
+  state.deptSort = localStorage.getItem('hij_dept_sort') || 'default';
+}
+function saveDepartments(){ localStorage.setItem(STORAGE_KEYS.departments, JSON.stringify(state.departments)); }
+function saveProjects(){ localStorage.setItem(STORAGE_KEYS.projects, JSON.stringify(state.projects)); }
+function saveKpis(){ localStorage.setItem(STORAGE_KEYS.kpis, JSON.stringify(state.kpis)); }
+function saveAccounts(){ localStorage.setItem(STORAGE_KEYS.accounts, JSON.stringify(state.accounts)); }
+
+/* ---------------- helpers ---------------- */
+function uid(prefix){ return prefix + '_' + Math.random().toString(36).slice(2,9); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function fmtMoney(n){ return '$' + Math.round(n).toLocaleString('en-US'); }
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.opacity = '1';
+  t.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>{ t.style.opacity='0'; t.style.transform='translateX(-50%) translateY(20px)'; }, 2200);
+}
+function dailySaving(k){
+  if(k.type !== '재무') return 0;
+  if(k.calcMethod === 'manual') return Number(k.manualDaily)||0;
+  const units = Number(k.units)||0;
+  let unitsPerDay = units;
+  if(k.cycle === '건/주') unitsPerDay = units/7;
+  else if(k.cycle === '건/월') unitsPerDay = units/30;
+  return (Number(k.wage)||0) * (Number(k.headcount)||0) * (Number(k.hours)||0) * unitsPerDay;
+}
+function daysSince(dateStr){
+  if(!dateStr) return 0;
+  const start = new Date(dateStr + 'T00:00:00');
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const diff = Math.floor((today - start)/86400000) + 1;
+  return Math.max(0, diff);
+}
+function accumulatedSaving(k){ return dailySaving(k) * daysSince(k.startDate); }
+function projectById(id){ return state.projects.find(p=>p.id===id); }
+
+/* ---------------- nav / shell render ---------------- */
+const NAV_META = {
+  summary: {title:'법인 현황', sub:'조직별 AI 프로젝트 진행 및 성과 현황 종합 관리'},
+  dept: {title:'부서별 변황', sub:'부서 카드 클릭 시 해당 부서 수행과제로 이동합니다'},
+  projects: {title:'부서별 과제 세부', sub:'등록된 AI 과제를 부서·단계별로 조회하고 관리합니다'},
+  kpi: {title:'과제별 성과(KPI)', sub:'완료/운영 과제의 누적 재무·비재무 성과를 자동 계산합니다'},
+  settings: {title:'설정', sub:'부서 구성, 데이터 백업, 관리자 계정을 관리합니다'}
+};
+
+function setView(v){
+  state.view = v;
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.nav===v));
+  document.getElementById('topbarTitle').textContent = NAV_META[v].title;
+  document.getElementById('topbarSub').textContent = NAV_META[v].sub;
+  renderTopbarRight();
+  renderContent();
+  if(v === 'projects') state.deptSubmenuOpen = true;
+  updateSubmenuVisibility();
+  renderSidebarDeptSubmenu();
+  document.getElementById('content').scrollTop = 0;
+  window.scrollTo(0,0);
+}
+
+/* ---------------- sidebar dept submenu ---------------- */
+function updateSubmenuVisibility(){
+  const sub = document.getElementById('deptSubmenu');
+  const btn = document.getElementById('projSubmenuToggle');
+  if(!sub) return;
+  sub.classList.toggle('collapsed', !state.deptSubmenuOpen);
+  if(btn) btn.textContent = state.deptSubmenuOpen ? '▾' : '▸';
+}
+
+const DEPT_SORT_LABELS = {default:'기본순(등록순)', name:'이름순(가나다)', countDesc:'과제 많은순', countAsc:'과제 적은순'};
+
+function renderSidebarDeptSubmenu(){
+  const listEl = document.getElementById('deptSubmenuList');
+  if(!listEl) return;
+
+  let rows = state.departments.map((d, idx)=>{
+    const projs = state.projects.filter(p=>p.dept===d);
+    return { dept:d, idx, count: projs.length, hasNew: projs.some(isProjectNew) };
+  });
+
+  if(state.deptSort === 'name') rows.sort((a,b)=>a.dept.localeCompare(b.dept,'ko'));
+  else if(state.deptSort === 'countDesc') rows.sort((a,b)=>b.count-a.count);
+  else if(state.deptSort === 'countAsc') rows.sort((a,b)=>a.count-b.count);
+  else rows.sort((a,b)=>a.idx-b.idx);
+
+  listEl.innerHTML = rows.length ? rows.map(r=>{
+    const color = DEPT_COLORS[r.idx % DEPT_COLORS.length];
+    const isActive = state.view === 'projects' && state.filters.dept === r.dept;
+    return `<div class="dept-sub-row ${isActive?'active':''}" data-dept-row="${esc(r.dept)}">
+      <span class="dot" style="background:${color}"></span>
+      <span class="d-name">${esc(r.dept)}</span>
+      ${r.hasNew ? '<span class="n-badge">N</span>' : ''}
+      <span class="cnt-badge">${r.count}</span>
+    </div>`;
+  }).join('') : `<div style="padding:10px 12px;color:#5D6E7C;font-size:11.5px;">등록된 부서가 없습니다</div>`;
+
+  listEl.querySelectorAll('[data-dept-row]').forEach(row=>{
+    row.addEventListener('click', ()=>{
+      state.filters.dept = row.dataset.deptRow;
+      state.filters.stage = 'all';
+      state.filters.category = 'all';
+      state.filters.mode = state.filters.mode || 'table';
+      setView('projects');
+    });
+  });
+
+  const total = state.projects.length;
+  const totalBadgeEl = document.getElementById('projTotalBadge');
+  if(totalBadgeEl) totalBadgeEl.textContent = total;
+  const folderNBadgeEl = document.getElementById('projFolderNBadge');
+  if(folderNBadgeEl) folderNBadgeEl.style.display = state.projects.some(isProjectNew) ? 'flex' : 'none';
+
+  const lbl = document.getElementById('deptSortLabel');
+  if(lbl) lbl.textContent = DEPT_SORT_LABELS[state.deptSort];
+  document.querySelectorAll('#deptSortDropdown [data-sort-opt]').forEach(o=>{
+    o.classList.toggle('active', o.dataset.sortOpt === state.deptSort);
+  });
+}
+
+function renderTopbarRight(){
+  const el = document.getElementById('topbarRight');
+  el.innerHTML = '';
+  if(state.loggedIn && state.currentAccount){
+    const badge = document.createElement('div');
+    badge.className = 'login-badge';
+    const roleLabel = state.currentAccount.role==='admin' ? '관리자' : `${state.currentAccount.dept} 담당자`;
+    badge.innerHTML = `<span class="lb-dot"></span>${esc(roleLabel)} : ${esc(state.currentAccount.id)}`;
+    const logoutBtn = document.createElement('button');
+    logoutBtn.className = 'btn btn-ghost btn-sm';
+    logoutBtn.textContent = '로그아웃';
+    logoutBtn.onclick = ()=>{
+      state.loggedIn = false;
+      state.currentAccount = null;
+      sessionStorage.removeItem('hij_logged_in_account');
+      toast('로그아웃 되었습니다.');
+      renderTopbarRight();
+      renderContent();
+    };
+    el.appendChild(badge);
+    el.appendChild(logoutBtn);
+  }else{
+    const loginBtn = document.createElement('button');
+    loginBtn.className = 'btn btn-sm';
+    loginBtn.textContent = '🔐 로그인';
+    loginBtn.onclick = ()=>openLogin();
+    el.appendChild(loginBtn);
+  }
+}
+
+/* ---------------- auth gate ---------------- */
+function requireAdmin(action){
+  if(state.loggedIn){ action(); return; }
+  openLogin(action);
+}
+function openLogin(onSuccess){
+  document.getElementById('loginId').value = '';
+  document.getElementById('loginPw').value = '';
+  document.getElementById('loginErr').style.display = 'none';
+  showOverlay('loginOverlay');
+  document.getElementById('loginSubmit').onclick = ()=>{
+    const id = document.getElementById('loginId').value.trim();
+    const pw = document.getElementById('loginPw').value;
+    const acc = state.accounts.find(a=>a.id===id && a.pw===pw);
+    if(acc){
+      state.loggedIn = true;
+      state.currentAccount = acc;
+      sessionStorage.setItem('hij_logged_in_account', acc.id);
+      hideOverlay('loginOverlay');
+      renderTopbarRight();
+      toast(acc.role==='admin' ? '관리자로 로그인되었습니다.' : `${acc.dept} 담당자로 로그인되었습니다.`);
+      if(onSuccess) onSuccess();
+      else renderContent();
+    }else{
+      document.getElementById('loginErr').style.display = 'block';
+    }
+  };
+}
+
+/* ---------------- overlay utils ---------------- */
+function showOverlay(id){ document.getElementById(id).classList.add('show'); }
+function hideOverlay(id){ document.getElementById(id).classList.remove('show'); }
+document.querySelectorAll('[data-close]').forEach(b=>{
+  b.addEventListener('click', ()=> hideOverlay(b.dataset.close));
+});
+document.querySelectorAll('.overlay').forEach(o=>{
+  o.addEventListener('click', e=>{ if(e.target === o) hideOverlay(o.id); });
+});
+
+/* ---------------- content dispatch ---------------- */
+function renderContent(){
+  const c = document.getElementById('content');
+  if(state.view === 'summary') c.innerHTML = viewSummary();
+  else if(state.view === 'dept') c.innerHTML = viewDept();
+  else if(state.view === 'projects') c.innerHTML = viewProjects();
+  else if(state.view === 'kpi') c.innerHTML = viewKpi();
+  else if(state.view === 'settings') c.innerHTML = viewSettings();
+  bindViewEvents();
+}
+
+/* ================= SUMMARY VIEW ================= */
+function viewSummary(){
+  const total = state.projects.length;
+  const deptCount = new Set(state.projects.map(p=>p.dept)).size;
+  const avgAchv = total ? Math.round(state.projects.reduce((s,p)=>s+(Number(p.achv)||0),0)/total) : 0;
+  const doneCount = state.projects.filter(p=>p.stage==='완료/운영').length;
+  const donePct = total ? Math.round(doneCount/total*100) : 0;
+  const ongoingCount = total - doneCount;
+
+  const stageCounts = STAGES.map(s=>({stage:s, count: state.projects.filter(p=>p.stage===s).length}));
+  const maxStage = Math.max(1, ...stageCounts.map(s=>s.count));
+
+  const catMap = {};
+  state.projects.forEach(p=>{ const c = p.category || '미분류'; catMap[c] = (catMap[c]||0)+1; });
+  const catEntries = Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
+  const maxCat = Math.max(1, ...catEntries.map(e=>e[1]));
+
+  const top3 = state.projects
+    .filter(p=>p.stage !== '완료/운영')
+    .slice()
+    .sort((a,b)=>(Number(b.achv)||0)-(Number(a.achv)||0))
+    .slice(0,3);
+
+  const deptCounts = state.departments.map(d=>({dept:d, count: state.projects.filter(p=>p.dept===d).length}));
+  const maxDeptCount = Math.max(1, ...deptCounts.map(d=>d.count));
+
+  return `
+  <div class="card-grid">
+    ${statCard('🗂️','총 추진 과제 수', total+' 건', `참여 부서 ${deptCount}개`)}
+    ${statCard('🎯','평균 목표 달성률', avgAchv+'%', '전체 과제 평균', 'accent-amber')}
+    ${statCard('🚀','완료 및 운영 건수', doneCount+' 건', `전체의 ${donePct}% · <a data-goto="kpi">KPI 상세 보기 →</a>`, 'accent-teal')}
+    ${statCard('⚙️','진행 중 과제', ongoingCount+' 건', '기획/검토 ~ 안정화 단계')}
+    ${statCard('🏆','성과 측정 완료 과제', new Set(state.kpis.map(k=>k.projectId)).size+' 건', '현업 운영 중인 완료 과제', 'accent-brick')}
+  </div>
+
+  <div class="panel-row">
+    <div class="panel">
+      <div class="panel-head"><div><h3>① 단계별 과제 진행 현황</h3><div class="hint">클릭 시 해당 단계로 필터링된 과제 목록으로 이동</div></div></div>
+      <div class="panel-body">
+        <div class="stage-list">
+          ${stageCounts.map(s=>`
+            <div class="stage-row" data-goto-stage="${esc(s.stage)}">
+              <div class="stg-name">${esc(s.stage)}</div>
+              <div class="stg-track"><div class="stg-fill" style="width:${(s.count/maxStage*100)}%"></div></div>
+              <div class="stg-count">${s.count}건</div>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><div><h3>② 분류별 AI 도입 집중도</h3><div class="hint">클릭 시 해당 분류로 필터링된 과제 목록으로 이동</div></div></div>
+      <div class="panel-body">
+        ${catEntries.length ? catEntries.map(([cat,count])=>`
+          <div class="cat-row" data-goto-cat="${esc(cat)}">
+            <div class="cat-name">${esc(cat)}</div>
+            <div class="cat-track"><div class="cat-fill" style="width:${(count/maxCat*100)}%"></div></div>
+            <div class="cat-count">${count}건</div>
+          </div>`).join('') : emptyRow('등록된 과제 분류가 없습니다.')}
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><div><h3>⭐ 상위 우수 진행 과제 (Top Progress)</h3><div class="hint">진행 중 과제 중 진척도 상위 3건</div></div></div>
+    <div class="panel-body">
+      ${top3.length ? `<div class="top3-grid">${top3.map((p,i)=>`
+        <div class="top3-card">
+          <div class="top3-rank">${i+1}</div>
+          <span class="dept-tag">${esc(p.dept)}</span>
+          <div class="t3-title">${esc(p.title)}</div>
+          <div class="t3-bar"><div class="t3-fill" style="width:${p.achv||0}%"></div></div>
+          <div class="t3-pct">${p.achv||0}%</div>
+        </div>`).join('')}</div>` : emptyRow('진행 중인 과제가 없습니다.')}
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><div><h3>③ 부서별 과제 추진 현황</h3><div class="hint">막대 클릭 시 해당 부서 수행과제로 이동</div></div></div>
+    <div class="panel-body">
+      ${deptCounts.some(d=>d.count>0) ? `<div class="dept-bars">
+        ${deptCounts.map(d=>`
+          <div class="dept-bar-col" data-goto-dept="${esc(d.dept)}">
+            <div class="bar-val">${d.count}</div>
+            <div class="bar" style="height:${Math.max(4, d.count/maxDeptCount*130)}px"></div>
+            <div class="bar-label">${esc(d.dept)}</div>
+          </div>`).join('')}
+      </div>` : emptyRow('등록된 과제가 없습니다.')}
+    </div>
+  </div>
+  `;
+}
+
+function statCard(icon,label,value,footHtml,accentClass){
+  return `<div class="stat-card ${accentClass||''}">
+    <div class="top"><span class="label">${label}</span><span class="icon">${icon}</span></div>
+    <div class="value">${value}</div>
+    <div class="foot">${footHtml||''}</div>
+  </div>`;
+}
+function emptyRow(text){ return `<div class="empty-state"><div class="es-icon">🙈</div><div class="es-text">${esc(text)}</div></div>`; }
+
+/* ================= DEPT STATUS VIEW ================= */
+function viewDept(){
+  const cards = state.departments.map(d=>{
+    const projs = state.projects.filter(p=>p.dept===d);
+    const count = projs.length;
+    const avg = count ? Math.round(projs.reduce((s,p)=>s+(Number(p.achv)||0),0)/count) : 0;
+    const done = projs.filter(p=>p.stage==='완료/운영').length;
+    return `<div class="dept-card" data-goto-dept="${esc(d)}">
+      <div class="dc-top"><div class="dc-name">${esc(d)}</div><div class="dc-count">${count}건</div></div>
+      <div class="dc-metrics">
+        <div class="dc-metric"><div class="m-label">평균 달성률</div><div class="m-val">${avg}%</div></div>
+        <div class="dc-metric"><div class="m-label">완료/운영</div><div class="m-val">${done}건</div></div>
+      </div>
+      <div class="dc-bar"><div class="dc-fill" style="width:${avg}%"></div></div>
+    </div>`;
+  }).join('');
+
+  return `
+  <div class="panel">
+    <div class="panel-head"><div><h3>🏢 부서별 AI 과제 현황</h3><div class="hint">카드 클릭 시 해당 부서 수행과제로 이동합니다</div></div>
+      ${isAdmin() ? `<button class="btn btn-sm" data-open-dept-manage>부서 관리</button>` : ''}
+    </div>
+    <div class="panel-body">
+      <div class="dept-card-grid">${cards || emptyRow('등록된 부서가 없습니다.')}</div>
+    </div>
+  </div>`;
+}
+
+/* ================= PROJECTS VIEW ================= */
+function viewProjects(){
+  let list = state.projects.slice();
+  const f = state.filters;
+  if(f.dept !== 'all') list = list.filter(p=>p.dept===f.dept);
+  if(f.stage !== 'all') list = list.filter(p=>p.stage===f.stage);
+  if(f.category !== 'all') list = list.filter(p=>(p.category||'미분류')===f.category);
+
+  if(f.sort !== 'default'){
+    list.sort((a,b)=>{
+      let av,bv;
+      if(f.sort==='achv'){ av=Number(a.achv)||0; bv=Number(b.achv)||0; }
+      else if(f.sort==='dept'){ av=a.dept; bv=b.dept; }
+      else if(f.sort==='stage'){ av=STAGES.indexOf(a.stage); bv=STAGES.indexOf(b.stage); }
+      else if(f.sort==='title'){ av=a.title; bv=b.title; }
+      if(av<bv) return f.sortDir==='asc'?-1:1;
+      if(av>bv) return f.sortDir==='asc'?1:-1;
+      return 0;
+    });
+  }
+
+  const categories = Array.from(new Set(state.projects.map(p=>p.category||'미분류')));
+
+  return `
+  <div class="toolbar">
+    <div class="filter-group">
+      <select id="filterDept">
+        <option value="all">부서 전체</option>
+        ${state.departments.map(d=>`<option value="${esc(d)}" ${f.dept===d?'selected':''}>${esc(d)}</option>`).join('')}
+      </select>
+      <select id="filterStage">
+        <option value="all">단계 전체</option>
+        ${STAGES.map(s=>`<option value="${esc(s)}" ${f.stage===s?'selected':''}>${esc(s)}</option>`).join('')}
+      </select>
+      <select id="filterCategory">
+        <option value="all">분류 전체</option>
+        ${categories.map(c=>`<option value="${esc(c)}" ${f.category===c?'selected':''}>${esc(c)}</option>`).join('')}
+      </select>
+      ${(f.dept!=='all'||f.stage!=='all'||f.category!=='all') ? `<button class="btn btn-ghost btn-sm" id="clearFilters">필터 초기화 ✕</button>` : ''}
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <div class="view-toggle">
+        <button class="${f.mode==='table'?'active':''}" data-mode="table">☰ 테이블</button>
+        <button class="${f.mode==='card'?'active':''}" data-mode="card">▦ 카드</button>
+      </div>
+      <button class="btn btn-primary btn-sm" id="addProjectBtn">➕ 신규 과제 추가</button>
+    </div>
+  </div>
+
+  ${list.length===0 ? emptyRow('조건에 맞는 과제가 없습니다. 우측 상단에서 신규 과제를 추가하거나 CSV를 업로드해주세요.') :
+    (f.mode==='table' ? renderProjectTable(list) : renderProjectCards(list))}
+  `;
+}
+
+function renderProjectTable(list){
+  return `
+  <div class="panel">
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th data-sort="dept">부서명 ↕</th>
+          <th data-sort="title">AI 적용 핵심 과제 ↕</th>
+          <th>과제 분류</th>
+          <th data-sort="stage">진행 단계 ↕</th>
+          <th data-sort="achv">달성률 ↕</th>
+          <th>주요 성과/목표</th>
+          <th>연동</th>
+          ${state.loggedIn ? '<th>관리</th>' : ''}
+        </tr></thead>
+        <tbody>
+          ${list.map(p=>`
+            <tr>
+              <td><span class="dept-tag">${esc(p.dept)}</span></td>
+              <td style="font-weight:600;">${esc(p.title)}</td>
+              <td style="color:var(--ink-faint);">${esc(p.category||'-')}</td>
+              <td><span class="stage-tag ${STAGE_CLASS[p.stage]||''}"><span class="stage-dot"></span>${esc(p.stage)}</span></td>
+              <td style="font-family:var(--font-mono);font-weight:600;">${p.achv||0}%</td>
+              <td style="max-width:260px;color:var(--ink-soft);">${esc(p.goal||'-')}</td>
+              <td>${p.link ? `<a class="link-btn" href="${esc(p.link)}" target="_blank">📄 자료 보기</a>` : '-'}</td>
+              ${state.loggedIn ? `<td>${canManage(p.dept) ? `<div class="row-actions">
+                <button class="icon-btn" data-edit-project="${p.id}" title="수정">✎</button>
+                <button class="icon-btn" data-del-project="${p.id}" title="삭제">🗑</button>
+              </div>` : ''}</td>` : ''}
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+function renderProjectCards(list){
+  return `<div class="proj-card-grid">
+    ${list.map(p=>`
+      <div class="proj-card">
+        <div class="pc-top">
+          <span class="dept-tag">${esc(p.dept)}</span>
+          <span class="stage-tag ${STAGE_CLASS[p.stage]||''}"><span class="stage-dot"></span>${esc(p.stage)}</span>
+        </div>
+        <div class="pc-title">${esc(p.title)}</div>
+        <div class="pc-cat">${esc(p.category||'미분류')}</div>
+        <div class="pc-goal">${esc(p.goal||'-')}</div>
+        <div class="pc-bar-wrap"><div class="pc-bar"><div class="pc-fill" style="width:${p.achv||0}%"></div></div><div class="pc-pct">${p.achv||0}%</div></div>
+        ${p.link ? `<a class="link-btn" href="${esc(p.link)}" target="_blank">📄 실적 자료 보기</a>` : ''}
+        ${canManage(p.dept) ? `<div class="pc-actions">
+          <button class="btn btn-ghost btn-sm" data-edit-project="${p.id}">✎ 수정</button>
+          <button class="btn btn-ghost btn-sm" data-del-project="${p.id}">🗑 삭제</button>
+        </div>` : ''}
+      </div>`).join('')}
+  </div>`;
+}
+
+/* ================= KPI VIEW ================= */
+function viewKpi(){
+  const doneProjects = state.projects.filter(p=>p.stage==='완료/운영');
+  const measuredProjectIds = new Set(state.kpis.map(k=>k.projectId));
+  const measuredCount = doneProjects.filter(p=>measuredProjectIds.has(p.id)).length;
+  const unregistered = doneProjects.filter(p=>!measuredProjectIds.has(p.id));
+
+  const financialTotal = state.kpis.filter(k=>k.type==='재무').reduce((s,k)=>s+accumulatedSaving(k),0);
+  const nonFinancialCount = state.kpis.filter(k=>k.type==='비재무').length;
+
+  return `
+  <div class="card-grid" style="grid-template-columns:repeat(4,1fr);">
+    ${statCard('🏆','성과 측정 완료 과제', measuredCount+' 건', '현업 운영 중인 완료 과제')}
+    ${statCard('💵','누적 재무 성과 (비용 절감액)', fmtMoney(financialTotal), '개선일 ~ 오늘 날짜 기준 자동 합산', 'accent-amber')}
+    ${statCard('📈','Data 정확도 향상 성과', nonFinancialCount+' 건', '비재무적 지표 개선', 'accent-teal')}
+    ${statCard('⚡','KPI 미등록 완료 과제', unregistered.length+' 건', '완료/운영 상태인데 KPI가 없는 과제', unregistered.length? 'accent-brick':'')}
+  </div>
+
+  ${unregistered.length ? `
+  <div class="alert-box">
+    <div class="a-ic">⚡</div>
+    <div class="a-body">
+      <div class="a-title">KPI 미등록 완료 과제 — 완료/운영 상태인데 아직 KPI 성과가 없습니다. 눌러서 바로 추가하세요.</div>
+      <div class="a-list">
+        ${unregistered.map(p=>`<div class="alert-chip">${esc(p.dept)} · ${esc(p.title)} ${canManage(p.dept) ? `<button class="btn btn-sm" data-add-kpi-for="${p.id}">＋ KPI 추가</button>` : ''}</div>`).join('')}
+      </div>
+    </div>
+  </div>` : ''}
+
+  <div class="toolbar">
+    <div></div>
+    <button class="btn btn-primary btn-sm" id="addKpiBtn">➕ KPI 성과 추가</button>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><div><h3>💎 완료 과제별 상세 성과 (KPI)</h3><div class="hint">누적 성과는 오늘 날짜 기준 자동 계산 · 열 제목 클릭 시 정렬</div></div></div>
+    ${state.kpis.length===0 ? emptyRow('등록된 KPI 성과가 없습니다. 우측 상단에서 KPI를 추가하거나 CSV를 업로드해주세요.') : `
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>부서명</th><th>AI 적용 과제명</th><th>유형</th><th>성과 측정 공식 (변수)</th><th>누적 개선 성과 (Today 기준)</th>
+          ${state.loggedIn ? '<th>관리</th>' : ''}
+        </tr></thead>
+        <tbody>
+          ${state.kpis.map(k=>{
+            const proj = projectById(k.projectId);
+            let formula, result;
+            if(k.type==='재무'){
+              if(k.calcMethod==='manual'){
+                formula = `일일 절감액 직접입력 (${fmtMoney(k.manualDaily||0)}/일)`;
+              }else{
+                formula = `시간당인건비($${k.wage||0}) × 인원(${k.headcount||0}) × 건당시간(${k.hours||0}h) × 처리(${k.units||0}${k.cycle||'건/일'})`;
+              }
+              result = `<span style="color:var(--amber-deep);font-weight:700;">${fmtMoney(accumulatedSaving(k))}</span>`;
+            }else{
+              formula = `${esc(k.metricName||'-')}`;
+              result = `<span style="color:var(--teal);font-weight:700;">${esc(k.metricValue||'-')}</span>`;
+            }
+            return `<tr>
+              <td><span class="dept-tag">${esc(k.dept)}</span></td>
+              <td style="font-weight:600;">${esc(proj?proj.title:'(삭제된 과제)')}</td>
+              <td>${k.type==='재무'?'💵 재무':'📈 비재무'}</td>
+              <td style="font-family:var(--font-mono);font-size:11.5px;color:var(--ink-soft);">${formula}</td>
+              <td style="font-family:var(--font-mono);">${result}</td>
+              ${state.loggedIn ? `<td>${canManage(k.dept) ? `<div class="row-actions">
+                <button class="icon-btn" data-edit-kpi="${k.id}" title="수정">✎</button>
+                <button class="icon-btn" data-del-kpi="${k.id}" title="삭제">🗑</button>
+              </div>` : ''}</td>` : ''}
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>`}
+  </div>
+  `;
+}
+
+/* ================= SETTINGS VIEW ================= */
+function viewSettings(){
+  if(!state.loggedIn){
+    return `<div class="locked-note">
+      <div class="ln-ic">🔒</div>
+      <h3 style="margin-bottom:8px;">로그인이 필요합니다</h3>
+      <p style="font-size:13px;color:var(--ink-faint);margin-bottom:16px;">부서 구성, 데이터 백업, 계정 정보는 로그인 후 확인할 수 있습니다.</p>
+      <button class="btn btn-primary" id="settingsLoginBtn">🔐 로그인</button>
+    </div>`;
+  }
+  if(!isAdmin()){
+    return `
+    <div class="settings-grid">
+      <div class="settings-card">
+        <div class="sc-head">🔑 내 계정</div>
+        <div class="sc-body">
+          <p style="font-size:12.5px;color:var(--ink-soft);margin:0 0 12px;"><b>${esc(state.currentAccount.dept)}</b> 담당자 계정입니다. 소속 부서의 과제·KPI만 등록·수정할 수 있습니다.</p>
+          <div class="form-row"><label>아이디</label><input type="text" value="${esc(state.currentAccount.id)}" disabled></div>
+          <div class="form-row"><label>새 비밀번호 (변경 시에만 입력)</label><input type="password" id="myPwInput" placeholder="변경하지 않으려면 비워두세요"></div>
+          <button class="btn btn-primary btn-sm" id="saveMyPwBtn">비밀번호 저장</button>
+        </div>
+      </div>
+    </div>`;
+  }
+  return `
+  <div class="settings-grid">
+    <div class="settings-card">
+      <div class="sc-head">🏢 부서 구성</div>
+      <div class="sc-body">
+        <p style="font-size:12.5px;color:var(--ink-soft);margin:0 0 12px;">현재 ${state.departments.length}개 부서가 등록되어 있습니다. 부서를 추가하면 담당자 계정(초기 비밀번호 hij1234)이 자동 생성됩니다.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;">
+          ${state.departments.map(d=>`<span class="dept-tag" style="background:var(--surface-2);color:var(--ink-soft);">${esc(d)}</span>`).join('')}
+        </div>
+        <button class="btn btn-sm" id="openDeptManageBtn">부서 추가·수정·삭제</button>
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <div class="sc-head">🔑 계정 관리</div>
+      <div class="sc-body">
+        <p style="font-size:12.5px;color:var(--ink-soft);margin:0 0 12px;">부서 담당자 계정으로 로그인하면 해당 부서 과제·KPI만 등록·수정할 수 있습니다.</p>
+        <div id="accountManageList"></div>
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <div class="sc-head">📁 부서별 수행과제 데이터</div>
+      <div class="sc-body">
+        <div class="settings-row">
+          <div><div class="sr-label">과제 CSV 업로드</div><div class="sr-desc">부서명,AI 적용 핵심 과제,과제 분류,진행 단계,달성률,주요 성과/목표,링크 순서</div></div>
+          <label class="btn btn-sm" style="margin:0;">📂 업로드<input type="file" id="projectCsvInput" accept=".csv" style="display:none;"></label>
+        </div>
+        <div class="settings-row">
+          <div><div class="sr-label">과제 데이터 다운로드</div><div class="sr-desc">현재 등록된 전체 과제를 CSV로 내려받습니다</div></div>
+          <button class="btn btn-sm" id="downloadProjectsBtn">📥 다운로드</button>
+        </div>
+        <div class="settings-row">
+          <div><div class="sr-label">과제 전체 삭제</div><div class="sr-desc">등록된 모든 과제를 삭제합니다</div></div>
+          <button class="btn btn-danger btn-sm" id="deleteAllProjectsBtn">🗑 전체 삭제</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <div class="sc-head">🏆 KPI 성과 데이터</div>
+      <div class="sc-body">
+        <div class="settings-row">
+          <div><div class="sr-label">KPI CSV 업로드</div><div class="sr-desc">부서명,과제명,유형,값... 형식으로 업로드합니다</div></div>
+          <label class="btn btn-sm" style="margin:0;">📂 업로드<input type="file" id="kpiCsvInput" accept=".csv" style="display:none;"></label>
+        </div>
+        <div class="settings-row">
+          <div><div class="sr-label">KPI 데이터 다운로드</div><div class="sr-desc">현재 등록된 전체 KPI를 CSV로 내려받습니다</div></div>
+          <button class="btn btn-sm" id="downloadKpisBtn">📥 다운로드</button>
+        </div>
+        <div class="settings-row">
+          <div><div class="sr-label">KPI 초기화</div><div class="sr-desc">등록된 모든 KPI 성과를 삭제합니다</div></div>
+          <button class="btn btn-danger btn-sm" id="resetKpisBtn">⟳ 초기화</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  `;
+}
+
+/* ---------------- events per view ---------------- */
+function bindViewEvents(){
+  // stat card foot link (goto kpi)
+  document.querySelectorAll('[data-goto]').forEach(a=>{
+    a.addEventListener('click', e=>{ e.preventDefault(); setView(a.dataset.goto); });
+  });
+  // dashboard drilldowns
+  document.querySelectorAll('[data-goto-stage]').forEach(r=>{
+    r.addEventListener('click', ()=>{ state.filters.stage = r.dataset.gotoStage; state.filters.dept='all'; state.filters.category='all'; setView('projects'); });
+  });
+  document.querySelectorAll('[data-goto-cat]').forEach(r=>{
+    r.addEventListener('click', ()=>{ state.filters.category = r.dataset.gotoCat; state.filters.dept='all'; state.filters.stage='all'; setView('projects'); });
+  });
+  document.querySelectorAll('[data-goto-dept]').forEach(r=>{
+    r.addEventListener('click', ()=>{ state.filters.dept = r.dataset.gotoDept; state.filters.stage='all'; state.filters.category='all'; setView('projects'); });
+  });
+
+  // dept manage open
+  document.querySelectorAll('[data-open-dept-manage]').forEach(b=> b.addEventListener('click', openDeptManage));
+  const openDeptBtn = document.getElementById('openDeptManageBtn');
+  if(openDeptBtn) openDeptBtn.addEventListener('click', openDeptManage);
+
+  // ===== Projects view =====
+  const fd = document.getElementById('filterDept');
+  if(fd) fd.addEventListener('change', e=>{ state.filters.dept = e.target.value; renderContent(); });
+  const fs = document.getElementById('filterStage');
+  if(fs) fs.addEventListener('change', e=>{ state.filters.stage = e.target.value; renderContent(); });
+  const fc = document.getElementById('filterCategory');
+  if(fc) fc.addEventListener('change', e=>{ state.filters.category = e.target.value; renderContent(); });
+  const clearBtn = document.getElementById('clearFilters');
+  if(clearBtn) clearBtn.addEventListener('click', ()=>{ state.filters.dept='all'; state.filters.stage='all'; state.filters.category='all'; renderContent(); });
+  document.querySelectorAll('[data-mode]').forEach(b=>{
+    b.addEventListener('click', ()=>{ state.filters.mode = b.dataset.mode; renderContent(); });
+  });
+  document.querySelectorAll('[data-sort]').forEach(th=>{
+    th.addEventListener('click', ()=>{
+      const key = th.dataset.sort;
+      if(state.filters.sort === key) state.filters.sortDir = state.filters.sortDir==='asc'?'desc':'asc';
+      else { state.filters.sort = key; state.filters.sortDir = 'asc'; }
+      renderContent();
+    });
+  });
+  const addProjectBtn = document.getElementById('addProjectBtn');
+  if(addProjectBtn) addProjectBtn.addEventListener('click', ()=> requireAdmin(()=>openProjectModal()));
+  document.querySelectorAll('[data-edit-project]').forEach(b=>{
+    b.addEventListener('click', ()=> requireAdmin(()=>openProjectModal(b.dataset.editProject)));
+  });
+  document.querySelectorAll('[data-del-project]').forEach(b=>{
+    b.addEventListener('click', ()=> requireAdmin(()=>confirmDelete('project', b.dataset.delProject, '이 과제를 삭제하시겠습니까? 연결된 KPI 데이터도 함께 삭제됩니다.')));
+  });
+
+  // ===== KPI view =====
+  const addKpiBtn = document.getElementById('addKpiBtn');
+  if(addKpiBtn) addKpiBtn.addEventListener('click', ()=> requireAdmin(()=>openKpiModal()));
+  document.querySelectorAll('[data-add-kpi-for]').forEach(b=>{
+    b.addEventListener('click', ()=> requireAdmin(()=>openKpiModal(null, b.dataset.addKpiFor)));
+  });
+  document.querySelectorAll('[data-edit-kpi]').forEach(b=>{
+    b.addEventListener('click', ()=> requireAdmin(()=>openKpiModal(b.dataset.editKpi)));
+  });
+  document.querySelectorAll('[data-del-kpi]').forEach(b=>{
+    b.addEventListener('click', ()=> requireAdmin(()=>confirmDelete('kpi', b.dataset.delKpi, '이 KPI 성과를 삭제하시겠습니까?')));
+  });
+
+  // ===== Settings view =====
+  const settingsLoginBtn = document.getElementById('settingsLoginBtn');
+  if(settingsLoginBtn) settingsLoginBtn.addEventListener('click', ()=>openLogin(()=>renderContent()));
+
+  const saveMyPwBtn = document.getElementById('saveMyPwBtn');
+  if(saveMyPwBtn) saveMyPwBtn.addEventListener('click', ()=>{
+    const pw = document.getElementById('myPwInput').value;
+    if(!pw){ toast('새 비밀번호를 입력해주세요.'); return; }
+    state.currentAccount.pw = pw;
+    saveAccounts();
+    toast('비밀번호가 변경되었습니다.');
+    document.getElementById('myPwInput').value = '';
+  });
+
+  if(document.getElementById('accountManageList')) renderAccountManageList();
+
+  const dlProjects = document.getElementById('downloadProjectsBtn');
+  if(dlProjects) dlProjects.addEventListener('click', downloadProjectsCsv);
+  const dlKpis = document.getElementById('downloadKpisBtn');
+  if(dlKpis) dlKpis.addEventListener('click', downloadKpisCsv);
+  const upProjects = document.getElementById('projectCsvInput');
+  if(upProjects) upProjects.addEventListener('change', handleProjectCsvUpload);
+  const upKpis = document.getElementById('kpiCsvInput');
+  if(upKpis) upKpis.addEventListener('change', handleKpiCsvUpload);
+  const delAllProjects = document.getElementById('deleteAllProjectsBtn');
+  if(delAllProjects) delAllProjects.addEventListener('click', ()=>{
+    if(confirm('등록된 모든 과제를 삭제합니다. 계속하시겠습니까?')){
+      state.projects = []; saveProjects(); toast('전체 과제가 삭제되었습니다.'); renderContent(); renderSidebarDeptSubmenu();
+    }
+  });
+  const resetKpis = document.getElementById('resetKpisBtn');
+  if(resetKpis) resetKpis.addEventListener('click', ()=>{
+    if(confirm('등록된 모든 KPI 성과를 초기화합니다. 계속하시겠습니까?')){
+      state.kpis = []; saveKpis(); toast('KPI 성과가 초기화되었습니다.'); renderContent();
+    }
+  });
+}
+
+/* ---------------- delete confirm ---------------- */
+function confirmDelete(type, id, msg){
+  state.pendingDelete = {type, id};
+  document.getElementById('deleteMsg').textContent = msg;
+  showOverlay('deleteOverlay');
+}
+document.getElementById('deleteConfirm').addEventListener('click', ()=>{
+  const pd = state.pendingDelete;
+  if(!pd) return;
+  if(pd.type === 'project'){
+    state.projects = state.projects.filter(p=>p.id!==pd.id);
+    state.kpis = state.kpis.filter(k=>k.projectId!==pd.id);
+    saveProjects(); saveKpis();
+    toast('과제가 삭제되었습니다.');
+  }else if(pd.type === 'kpi'){
+    state.kpis = state.kpis.filter(k=>k.id!==pd.id);
+    saveKpis();
+    toast('KPI 성과가 삭제되었습니다.');
+  }
+  state.pendingDelete = null;
+  hideOverlay('deleteOverlay');
+  renderContent();
+  renderSidebarDeptSubmenu();
+});
+
+/* ---------------- project modal ---------------- */
+function fillDeptSelect(selectEl, current){
+  selectEl.innerHTML = '<option value="">선택하세요</option>' + state.departments.map(d=>`<option value="${esc(d)}" ${d===current?'selected':''}>${esc(d)}</option>`).join('');
+}
+function openProjectModal(id){
+  state.editingProjectId = id || null;
+  const isEdit = !!id;
+  document.getElementById('projectModalTitle').textContent = isEdit ? '✎ 과제 수정' : '➕ 신규 과제 추가';
+  const p = isEdit ? projectById(id) : null;
+  const deptSel = document.getElementById('pf_dept');
+  const lockDept = state.currentAccount && state.currentAccount.role==='dept' ? state.currentAccount.dept : null;
+  fillDeptSelect(deptSel, p ? p.dept : (lockDept || ''));
+  if(lockDept){ deptSel.value = lockDept; deptSel.disabled = true; } else { deptSel.disabled = false; }
+  document.getElementById('pf_category').value = p?p.category:'';
+  document.getElementById('pf_title').value = p?p.title:'';
+  document.getElementById('pf_stage').value = p?p.stage:'기획/검토';
+  document.getElementById('pf_achv').value = p?p.achv:'';
+  document.getElementById('pf_goal').value = p?p.goal:'';
+  document.getElementById('pf_link').value = p?p.link:'';
+  showOverlay('projectOverlay');
+}
+document.getElementById('pf_link').addEventListener('input', e=>{
+  const prev = document.getElementById('pf_linkPreview');
+  if(e.target.value){ prev.style.display='inline-block'; prev.href = e.target.value; }
+  else prev.style.display = 'none';
+});
+document.getElementById('projectSubmit').addEventListener('click', ()=>{
+  const dept = document.getElementById('pf_dept').value;
+  const category = document.getElementById('pf_category').value.trim();
+  const title = document.getElementById('pf_title').value.trim();
+  const stage = document.getElementById('pf_stage').value;
+  const achv = Math.max(0, Math.min(100, Number(document.getElementById('pf_achv').value) || 0));
+  const goal = document.getElementById('pf_goal').value.trim();
+  const link = document.getElementById('pf_link').value.trim();
+  if(!dept || !category || !title){ toast('부서명, 과제 분류, 과제명은 필수입니다.'); return; }
+
+  if(state.editingProjectId){
+    const p = projectById(state.editingProjectId);
+    Object.assign(p, {dept,category,title,stage,achv,goal,link});
+    toast('과제가 수정되었습니다.');
+  }else{
+    state.projects.push({id:uid('p'), dept,category,title,stage,achv,goal,link,createdAt:Date.now()});
+    toast('신규 과제가 추가되었습니다.');
+  }
+  saveProjects();
+  hideOverlay('projectOverlay');
+  renderContent();
+  renderSidebarDeptSubmenu();
+});
+
+/* ---------------- KPI modal ---------------- */
+function refreshKpiProjectOptions(deptFilter, current){
+  const sel = document.getElementById('kf_project');
+  const projs = state.projects.filter(p=> !deptFilter || p.dept===deptFilter);
+  sel.innerHTML = '<option value="">과제를 선택하세요</option>' + projs.map(p=>`<option value="${p.id}" ${p.id===current?'selected':''}>${esc(p.title)} (${esc(p.stage)})</option>`).join('');
+}
+function updateKpiCalcPreview(){
+  const wage = Number(document.getElementById('kf_wage').value)||0;
+  const hc = Number(document.getElementById('kf_headcount').value)||0;
+  const hours = Number(document.getElementById('kf_hours').value)||0;
+  const units = Number(document.getElementById('kf_units').value)||0;
+  const cycle = document.getElementById('kf_cycle').value;
+  let perDay = units;
+  if(cycle==='건/주') perDay = units/7; else if(cycle==='건/월') perDay = units/30;
+  const daily = wage*hc*hours*perDay;
+  document.getElementById('kf_dailyPreview').textContent = fmtMoney(daily);
+}
+['kf_wage','kf_headcount','kf_hours','kf_units','kf_cycle'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', updateKpiCalcPreview);
+  document.getElementById(id).addEventListener('change', updateKpiCalcPreview);
+});
+document.querySelectorAll('input[name=kf_type]').forEach(r=>{
+  r.addEventListener('change', e=>{
+    const isFin = e.target.value === '재무';
+    document.getElementById('kf_financialBlock').style.display = isFin ? 'block':'none';
+    document.getElementById('kf_nonFinancialBlock').style.display = isFin ? 'none':'block';
+  });
+});
+document.querySelectorAll('input[name=kf_calc]').forEach(r=>{
+  r.addEventListener('change', e=>{
+    const isAuto = e.target.value === 'auto';
+    document.getElementById('kf_autoFields').style.display = isAuto?'block':'none';
+    document.getElementById('kf_manualFields').style.display = isAuto?'none':'block';
+  });
+});
+document.getElementById('kf_dept').addEventListener('change', e=>{
+  refreshKpiProjectOptions(e.target.value, null);
+});
+
+function openKpiModal(id, forProjectId){
+  state.editingKpiId = id || null;
+  const isEdit = !!id;
+  document.getElementById('kpiModalTitle').textContent = isEdit ? '✎ KPI 성과 수정' : '➕ KPI 성과 추가';
+  const k = isEdit ? state.kpis.find(x=>x.id===id) : null;
+  const forProj = forProjectId ? projectById(forProjectId) : (k?projectById(k.projectId):null);
+
+  const kfDeptSel = document.getElementById('kf_dept');
+  const lockDept = state.currentAccount && state.currentAccount.role==='dept' ? state.currentAccount.dept : null;
+  const initDept = k ? k.dept : (forProj ? forProj.dept : (lockDept || ''));
+  fillDeptSelect(kfDeptSel, initDept);
+  if(lockDept){ kfDeptSel.value = lockDept; kfDeptSel.disabled = true; } else { kfDeptSel.disabled = false; }
+  refreshKpiProjectOptions(kfDeptSel.value, k?k.projectId:(forProj?forProj.id:null));
+
+  const type = k?k.type:'재무';
+  document.querySelector(`input[name=kf_type][value="${type}"]`).checked = true;
+  document.getElementById('kf_financialBlock').style.display = type==='재무'?'block':'none';
+  document.getElementById('kf_nonFinancialBlock').style.display = type==='재무'?'none':'block';
+
+  const calcMethod = k?k.calcMethod:'auto';
+  document.querySelector(`input[name=kf_calc][value="${calcMethod||'auto'}"]`).checked = true;
+  document.getElementById('kf_autoFields').style.display = calcMethod==='manual'?'none':'block';
+  document.getElementById('kf_manualFields').style.display = calcMethod==='manual'?'block':'none';
+
+  document.getElementById('kf_wage').value = k?k.wage:'';
+  document.getElementById('kf_headcount').value = k?k.headcount:'';
+  document.getElementById('kf_hours').value = k?k.hours:'';
+  document.getElementById('kf_units').value = k?k.units:'';
+  document.getElementById('kf_cycle').value = k?(k.cycle||'건/일'):'건/일';
+  document.getElementById('kf_manualDaily').value = k?k.manualDaily:'';
+  document.getElementById('kf_startDate').value = k?k.startDate:new Date().toISOString().slice(0,10);
+  document.getElementById('kf_metricName').value = k?k.metricName:'';
+  document.getElementById('kf_metricValue').value = k?k.metricValue:'';
+  document.getElementById('kf_note').value = k?k.note:'';
+  updateKpiCalcPreview();
+  showOverlay('kpiOverlay');
+}
+document.getElementById('kpiSubmit').addEventListener('click', ()=>{
+  const dept = document.getElementById('kf_dept').value;
+  const projectId = document.getElementById('kf_project').value;
+  const type = document.querySelector('input[name=kf_type]:checked').value;
+  if(!dept || !projectId){ toast('부서명과 연관 과제는 필수입니다.'); return; }
+
+  const record = {
+    id: state.editingKpiId || uid('k'),
+    dept, projectId, type,
+    note: document.getElementById('kf_note').value.trim()
+  };
+  if(type==='재무'){
+    const calcMethod = document.querySelector('input[name=kf_calc]:checked').value;
+    record.calcMethod = calcMethod;
+    record.wage = Number(document.getElementById('kf_wage').value)||0;
+    record.headcount = Number(document.getElementById('kf_headcount').value)||0;
+    record.hours = Number(document.getElementById('kf_hours').value)||0;
+    record.units = Number(document.getElementById('kf_units').value)||0;
+    record.cycle = document.getElementById('kf_cycle').value;
+    record.manualDaily = Number(document.getElementById('kf_manualDaily').value)||0;
+    record.startDate = document.getElementById('kf_startDate').value || new Date().toISOString().slice(0,10);
+  }else{
+    record.metricName = document.getElementById('kf_metricName').value.trim();
+    record.metricValue = document.getElementById('kf_metricValue').value.trim();
+    record.startDate = document.getElementById('kf_startDate').value || new Date().toISOString().slice(0,10);
+  }
+
+  if(state.editingKpiId){
+    const idx = state.kpis.findIndex(k=>k.id===state.editingKpiId);
+    state.kpis[idx] = record;
+    toast('KPI 성과가 수정되었습니다.');
+  }else{
+    state.kpis.push(record);
+    toast('KPI 성과가 추가되었습니다.');
+  }
+  saveKpis();
+  hideOverlay('kpiOverlay');
+  renderContent();
+});
+
+/* ---------------- department management ---------------- */
+function openDeptManage(){
+  if(!isAdmin()){ toast('관리자만 접근할 수 있습니다.'); return; }
+  renderDeptManageList();
+  showOverlay('deptOverlay');
+}
+function renderDeptManageList(){
+  const el = document.getElementById('deptManageList');
+  el.innerHTML = state.departments.map((d,i)=>{
+    const count = state.projects.filter(p=>p.dept===d).length;
+    return `<div class="dept-manage-row">
+      <input type="text" value="${esc(d)}" data-dept-idx="${i}">
+      <span style="font-size:11px;color:var(--ink-faint);white-space:nowrap;">${count}건</span>
+      <button class="icon-btn" data-dept-save="${i}" title="저장">💾</button>
+      <button class="icon-btn" data-dept-del="${i}" title="삭제" ${count>0?'disabled':''}>🗑</button>
+    </div>`;
+  }).join('');
+  el.querySelectorAll('[data-dept-save]').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const idx = Number(b.dataset.deptSave);
+      const input = el.querySelector(`input[data-dept-idx="${idx}"]`);
+      const newName = input.value.trim();
+      if(!newName){ toast('부서명을 입력해주세요.'); return; }
+      const oldName = state.departments[idx];
+      if(newName !== oldName){
+        state.projects.forEach(p=>{ if(p.dept===oldName) p.dept = newName; });
+        state.kpis.forEach(k=>{ if(k.dept===oldName) k.dept = newName; });
+        state.accounts.forEach(a=>{ if(a.dept===oldName) a.dept = newName; });
+        state.departments[idx] = newName;
+        saveDepartments(); saveProjects(); saveKpis(); saveAccounts();
+        toast('부서명이 변경되었습니다. (연결된 담당자 계정도 함께 변경됨)');
+        renderDeptManageList();
+        renderContent();
+        renderSidebarDeptSubmenu();
+      }
+    });
+  });
+  el.querySelectorAll('[data-dept-del]').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const idx = Number(b.dataset.deptDel);
+      const name = state.departments[idx];
+      const count = state.projects.filter(p=>p.dept===name).length;
+      if(count>0){ toast('과제가 등록된 부서는 삭제할 수 없습니다.'); return; }
+      state.accounts = state.accounts.filter(a=>a.dept!==name);
+      saveAccounts();
+      state.departments.splice(idx,1);
+      saveDepartments();
+      toast('부서와 연결된 담당자 계정이 함께 삭제되었습니다.');
+      renderDeptManageList();
+      renderContent();
+      renderSidebarDeptSubmenu();
+    });
+  });
+}
+document.getElementById('addDeptBtn').addEventListener('click', ()=>{
+  const input = document.getElementById('newDeptName');
+  const name = input.value.trim();
+  if(!name){ toast('부서명을 입력해주세요.'); return; }
+  if(state.departments.includes(name)){ toast('이미 존재하는 부서명입니다.'); return; }
+  state.departments.push(name);
+  saveDepartments();
+  state.accounts.push({id: deptToAccountId(name), pw:'hij1234', role:'dept', dept:name});
+  saveAccounts();
+  input.value = '';
+  toast('부서와 담당자 계정(초기 비밀번호 hij1234)이 추가되었습니다.');
+  renderDeptManageList();
+  renderContent();
+  renderSidebarDeptSubmenu();
+});
+
+/* ---------------- account management (admin only) ---------------- */
+function renderAccountManageList(){
+  const el = document.getElementById('accountManageList');
+  if(!el || !isAdmin()) return;
+  el.innerHTML = state.accounts.map((a,i)=>`
+    <div class="dept-manage-row">
+      <span style="flex:1;font-size:13px;color:var(--ink);">${esc(a.id)}
+        <span style="color:var(--ink-faint);font-size:11.5px;">(${a.role==='admin' ? '통합관리자' : esc(a.dept)+' 담당자'})</span>
+      </span>
+      <button class="icon-btn" data-reset-pw="${i}" title="비밀번호 재설정">🔑</button>
+    </div>`).join('');
+  el.querySelectorAll('[data-reset-pw]').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const idx = Number(b.dataset.resetPw);
+      const acc = state.accounts[idx];
+      const newPw = prompt(`'${acc.id}' 계정의 새 비밀번호를 입력하세요.`);
+      if(newPw){
+        acc.pw = newPw;
+        saveAccounts();
+        toast('비밀번호가 변경되었습니다.');
+      }
+    });
+  });
+}
+
+/* ---------------- CSV import/export ---------------- */
+function csvEscape(v){
+  const s = String(v==null?'':v);
+  if(/[",\n]/.test(s)) return '"' + s.replace(/"/g,'""') + '"';
+  return s;
+}
+function downloadCsv(filename, rows){
+  const csv = rows.map(r=>r.map(csvEscape).join(',')).join('\r\n');
+  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+function parseCsv(text){
+  const rows = []; let row = []; let field=''; let inQuotes=false;
+  for(let i=0;i<text.length;i++){
+    const c = text[i];
+    if(inQuotes){
+      if(c==='"'){ if(text[i+1]==='"'){ field+='"'; i++; } else inQuotes=false; }
+      else field+=c;
+    }else{
+      if(c==='"') inQuotes=true;
+      else if(c===','){ row.push(field); field=''; }
+      else if(c==='\n'){ row.push(field); rows.push(row); row=[]; field=''; }
+      else if(c==='\r'){ /* skip */ }
+      else field+=c;
+    }
+  }
+  if(field.length||row.length){ row.push(field); rows.push(row); }
+  return rows.filter(r=> r.length>1 || (r[0]&&r[0].trim()!==''));
+}
+
+function downloadProjectsCsv(){
+  const rows = [['부서명','AI 적용 핵심 과제','과제 분류','진행 단계','달성률','주요 성과/목표','링크']];
+  state.projects.forEach(p=> rows.push([p.dept,p.title,p.category,p.stage,p.achv,p.goal,p.link]));
+  downloadCsv('hij_projects.csv', rows);
+}
+function downloadKpisCsv(){
+  const rows = [['부서명','과제명','유형','계산방식','시간당인건비','인원','건당시간','처리건수','주기','일일수동입력','개선지표','개선결과','개선일','비고']];
+  state.kpis.forEach(k=>{
+    const proj = projectById(k.projectId);
+    rows.push([k.dept, proj?proj.title:'', k.type, k.calcMethod||'', k.wage||'', k.headcount||'', k.hours||'', k.units||'', k.cycle||'', k.manualDaily||'', k.metricName||'', k.metricValue||'', k.startDate||'', k.note||'']);
+  });
+  downloadCsv('hij_kpis.csv', rows);
+}
+function handleProjectCsvUpload(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    const rows = parseCsv(reader.result);
+    if(rows.length && /부서명|dept/i.test(rows[0][0])) rows.shift();
+    let added = 0;
+    rows.forEach(r=>{
+      if(!r[0] || !r[1]) return;
+      const dept = r[0].trim();
+      if(!state.departments.includes(dept)) state.departments.push(dept);
+      state.projects.push({
+        id: uid('p'), dept, title: (r[1]||'').trim(), category:(r[2]||'').trim(),
+        stage:(r[3]||'기획/검토').trim(), achv:Number(r[4])||0, goal:(r[5]||'').trim(), link:(r[6]||'').trim(),
+        createdAt: Date.now()
+      });
+      added++;
+    });
+    saveDepartments(); saveProjects();
+    toast(`${added}건의 과제를 업로드했습니다.`);
+    renderContent();
+    renderSidebarDeptSubmenu();
+    e.target.value = '';
+  };
+  reader.readAsText(file, 'utf-8');
+}
+function handleKpiCsvUpload(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    const rows = parseCsv(reader.result);
+    if(rows.length && /부서명|dept/i.test(rows[0][0])) rows.shift();
+    let added = 0;
+    rows.forEach(r=>{
+      const dept = (r[0]||'').trim();
+      const projTitle = (r[1]||'').trim();
+      if(!dept || !projTitle) return;
+      const proj = state.projects.find(p=>p.dept===dept && p.title===projTitle);
+      if(!proj) return;
+      const type = (r[2]||'재무').trim();
+      const rec = {id:uid('k'), dept, projectId:proj.id, type, note:(r[13]||'').trim()};
+      if(type==='재무'){
+        rec.calcMethod = (r[3]||'auto').trim();
+        rec.wage=Number(r[4])||0; rec.headcount=Number(r[5])||0; rec.hours=Number(r[6])||0;
+        rec.units=Number(r[7])||0; rec.cycle=(r[8]||'건/일').trim(); rec.manualDaily=Number(r[9])||0;
+        rec.startDate=(r[12]||new Date().toISOString().slice(0,10)).trim();
+      }else{
+        rec.metricName=(r[10]||'').trim(); rec.metricValue=(r[11]||'').trim();
+        rec.startDate=(r[12]||new Date().toISOString().slice(0,10)).trim();
+      }
+      state.kpis.push(rec); added++;
+    });
+    saveKpis();
+    toast(`${added}건의 KPI를 업로드했습니다.`);
+    renderContent();
+    e.target.value = '';
+  };
+  reader.readAsText(file, 'utf-8');
+}
+
+/* ---------------- sidebar nav & collapse ---------------- */
+document.querySelectorAll('.nav-item').forEach(item=>{
+  item.addEventListener('click', ()=>{
+    if(item.dataset.nav === 'projects'){
+      state.filters.dept = 'all'; state.filters.stage = 'all'; state.filters.category = 'all';
+    }
+    setView(item.dataset.nav);
+  });
+});
+document.getElementById('collapseBtn').addEventListener('click', ()=>{
+  const sb = document.getElementById('sidebar');
+  sb.classList.toggle('collapsed');
+});
+
+document.getElementById('projSubmenuToggle').addEventListener('click', e=>{
+  e.stopPropagation();
+  state.deptSubmenuOpen = !state.deptSubmenuOpen;
+  updateSubmenuVisibility();
+});
+document.getElementById('deptSortPill').addEventListener('click', e=>{
+  e.stopPropagation();
+  document.getElementById('deptSortDropdown').classList.toggle('show');
+});
+document.querySelectorAll('#deptSortDropdown [data-sort-opt]').forEach(o=>{
+  o.addEventListener('click', e=>{
+    e.stopPropagation();
+    state.deptSort = o.dataset.sortOpt;
+    localStorage.setItem('hij_dept_sort', state.deptSort);
+    document.getElementById('deptSortDropdown').classList.remove('show');
+    renderSidebarDeptSubmenu();
+  });
+});
+document.addEventListener('click', ()=>{
+  const dd = document.getElementById('deptSortDropdown');
+  if(dd) dd.classList.remove('show');
+});
+
+/* ---------------- init ---------------- */
+loadState();
+setView('summary');
+</script>
+
+
+</body></html>
