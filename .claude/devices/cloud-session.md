@@ -6,7 +6,7 @@
 - OS: Linux 6.18.44-fc-v33 (x86_64)
 - 저장소 경로: /home/user/hij-dashboard
 - 세션 종류: 클라우드 (claude.ai/code)
-- 마지막 확인: 2026-09-17 02:37 +0000
+- 마지막 확인: 2026-09-17 02:45 +0000
 
 ## 설치된 도구
 - git: git version 2.43.0
@@ -17,6 +17,7 @@
 - ruby: ruby 3.3.6 (2024-11-05 revision 75015d4c1f) [x86_64-linux]
 
 ## 추적 파일
+- .claude/devices/cloud-session.md
 - .claude/hooks/session-start.sh
 - .claude/settings.json
 - CLAUDE.md
