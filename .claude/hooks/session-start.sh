@@ -43,10 +43,10 @@ else
   echo "⚠ 원격 추적 브랜치 없음 — 첫 푸시는 git push -u origin $branch"
 fi
 
-dirty=$(git status --porcelain 2>/dev/null | grep -v '^?? \.claude/devices/' | wc -l | tr -d ' ')
+dirty=$(git status --porcelain 2>/dev/null | grep -v '\.claude/devices/' | wc -l | tr -d ' ')
 if [ "$dirty" != "0" ]; then
   echo "⚠ 커밋 안 된 변경 $dirty건:"
-  git status --short 2>/dev/null | grep -v '^?? \.claude/devices/' | head -10
+  git status --short 2>/dev/null | grep -v '\.claude/devices/' | head -10
 fi
 
 last=$(git log -1 --format='%h  %ad  %an  %s' --date=format:'%Y-%m-%d %H:%M' 2>/dev/null || true)
