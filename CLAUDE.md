@@ -118,6 +118,39 @@ git push -u origin <작업-브랜치>
 리포트에 잡히려면 **그날 작업을 푸시해야 한다.** 로컬에만 있는 커밋은
 집계되지 않는다.
 
+## 새 기기 연결하기
+
+새 랩탑·데스크탑을 이 저장소의 기기 동기화에 참여시킬 때의 절차.
+
+**1. 저장소를 받는다**
+
+```bash
+git clone https://github.com/nixair-VSC/hij-dashboard
+cd hij-dashboard
+```
+
+동기화 설정이 아직 `main`에 병합되지 않았다면 해당 브랜치를 체크아웃한다:
+
+```bash
+git checkout claude/claudecode-desktop-mobile-sharing-9j31r0
+```
+
+**2. 기기를 등록한다**
+
+```bash
+bash .claude/connect-device.sh
+```
+
+스냅샷 생성 → 커밋 → 푸시를 한 번에 처리한다. 소스 코드는 건드리지 않고
+`.claude/devices/` 아래만 커밋한다.
+
+**3. 확인한다**
+
+이후 이 기기에서 Claude Code를 실행하면 세션 시작 시 다른 기기 목록이 뜬다.
+
+도구를 새로 설치했거나 저장소 경로가 바뀌는 등 환경이 달라지면 같은 명령을
+다시 실행해 기록을 갱신한다.
+
 ## 편집 규칙
 
 - `index.html`은 10만 자가 넘는 단일 파일이다. **부분 수정(Edit/sed)으로 작업하고,
